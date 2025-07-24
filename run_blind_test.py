@@ -6,9 +6,6 @@ Quick script to run blind test on already processed documents
 import sys
 from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent))
-
 from src.evaluation.blind_test import BlindTestEvaluator
 
 def main():

@@ -16,9 +16,6 @@ from rich.panel import Panel
 from rich.progress import track
 from rich.prompt import Confirm
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent))
-
 from src.core.smart_ingestion import SmartIngestionPlanner
 
 console = Console()

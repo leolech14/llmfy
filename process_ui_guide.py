@@ -7,9 +7,6 @@ import sys
 import os
 from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent / 'src'))
-
 # Import our modules
 from src.quality.quality_scorer import KnowledgeQualityAnalyzer as QualityAnalyzer
 from src.quality.quality_enhancer import QualityEnhancer

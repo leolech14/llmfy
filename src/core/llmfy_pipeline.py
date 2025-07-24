@@ -5,22 +5,18 @@
 This is the main pipeline that transforms documents into LLM-ready chunks.
 """
 
-import sys
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import json
 
-# Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-from src.core.pipeline import KnowledgeBasePipeline
-from src.core.document_loader import DocumentLoader
-from src.core.text_processor_v2 import TextProcessorV2SlidingWindow, ChunkingConfig
-from src.quality.quality_scorer_v2 import ImprovedQualityAnalyzer as QualityAnalyzer
-from src.quality.quality_enhancer import QualityEnhancer
-from src.embeddings.hybrid_embedder import HybridEmbedder
-from src.core.chunk_optimizer import ChunkOptimizer
+from .pipeline import KnowledgeBasePipeline
+from .document_loader import DocumentLoader
+from .text_processor_v2 import TextProcessorV2SlidingWindow, ChunkingConfig
+from ..quality.quality_scorer_v2 import ImprovedQualityAnalyzer as QualityAnalyzer
+from ..quality.quality_enhancer import QualityEnhancer
+from ..embeddings.hybrid_embedder import HybridEmbedder
+from .chunk_optimizer import ChunkOptimizer
 
 from rich.console import Console
 from rich.panel import Panel
@@ -337,7 +333,7 @@ class LlmfyPipeline(KnowledgeBasePipeline):
         
         if Confirm.ask("\n[cyan]Would you like to run a blind test evaluation?[/cyan]"):
             try:
-                from src.evaluation.blind_test import BlindTestEvaluator
+                from ..evaluation.blind_test import BlindTestEvaluator
                 console.print("\n[bold]🔍 Starting blind test evaluation...[/bold]")
                 
                 evaluator = BlindTestEvaluator()

@@ -18,9 +18,6 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.progress import track
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent))
-
 from src.quality.quality_scorer import QualityAnalyzer
 
 console = Console()
