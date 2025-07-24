@@ -384,7 +384,7 @@ class SmartIngestionPlanner:
                 enhancement_strategies.append('expand_content')
         
         # Estimate costs
-        if os.getenv('NEXUS_ENV', 'development') == 'development':
+        if os.getenv('LLMFY_ENV', 'development') == 'development':
             estimated_cost = 0  # Free local embeddings
         else:
             # ~$0.0001 per 1K tokens, ~250 tokens per chunk

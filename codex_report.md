@@ -6,7 +6,7 @@
 - Fixed truncated lines in `README.md` and added an AI generated content disclaimer.
 - Cleaned `requirements.txt` and restored final dependency line.
 - Updated `KnowledgeQualityAnalyzer` to use a portable default data path.
-- Replaced several lingering `Nexus` references with `llmfy`.
+- Replaced several lingering references with `llmfy`.
 - Installed optional dependency `chromadb` so tests collect properly.
 
 ## Testing

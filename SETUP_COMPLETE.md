@@ -1,8 +1,8 @@
-# ✅ Nexus AI Library Setup Complete!
+# ✅ llmfy AI Library Setup Complete!
 
 ## What We've Built
 
-The **Nexus AI Library System** is now fully configured and ready to use. This is a production-ready, quality-first knowledge management system that ensures every piece of content meets a 9.5/10 quality standard.
+The **llmfy AI Library System** is now fully configured and ready to use. This is a production-ready, quality-first knowledge management system that ensures every piece of content meets a 9.5/10 quality standard.
 
 ## 🔑 Your Configuration
 
@@ -21,7 +21,7 @@ The **Nexus AI Library System** is now fully configured and ready to use. This i
 
 ### 1. Activate Virtual Environment
 ```bash
-cd /Users/lech/02_knowledge/nexus_ai_library
+cd /Users/lech/02_knowledge/llmfy_ai_library
 source venv/bin/activate
 ```
 
@@ -33,12 +33,12 @@ pip install langchain chromadb sentence-transformers openai pinecone-client
 ### 3. Process Your First Document
 ```bash
 # The test document is already in data/inbox/
-python -m src.core.nexus_pipeline --input data/inbox/test_document.md
+python -m src.core.llmfy_pipeline --input data/inbox/test_document.md
 ```
 
 ### 4. Validate Quality
 ```bash
-python nexus_validator.py data/processed/
+python llmfy_validator.py data/processed/
 ```
 
 ## 📊 Expected Results
@@ -82,10 +82,10 @@ This will:
 ## 📁 Project Structure
 
 ```
-nexus_ai_library/
+llmfy_ai_library/
 ├── 🚀 Core Scripts
-│   ├── nexus_quickstart.py    # One-command setup
-│   └── nexus_validator.py     # Quality validation
+│   ├── llmfy_quickstart.py    # One-command setup
+│   └── llmfy_validator.py     # Quality validation
 ├── 📦 Source Code (src/)
 │   ├── core/                  # Pipeline, config, orchestration
 │   ├── quality/               # Scoring & enhancement
@@ -123,7 +123,7 @@ Every chunk is scored on:
 
 1. **Test the System**:
    ```bash
-   python -m src.core.nexus_pipeline --input data/inbox/test_document.md
+   python -m src.core.llmfy_pipeline --input data/inbox/test_document.md
    ```
 
 2. **Process Your Existing Content**:
@@ -132,12 +132,12 @@ Every chunk is scored on:
    cp /Users/lech/02_knowledge/librarian/raw_documents/*.md data/inbox/
    
    # Process all
-   python -m src.core.nexus_pipeline
+   python -m src.core.llmfy_pipeline
    ```
 
 3. **Monitor Quality**:
    ```bash
-   python nexus_validator.py data/processed/
+   python llmfy_validator.py data/processed/
    ```
 
 4. **Check Costs**:
@@ -153,6 +153,6 @@ Every chunk is scored on:
 
 ## 🎉 Congratulations!
 
-Your Nexus AI Library is ready to ensure that every piece of knowledge in your system meets the highest quality standards. This will enable LLMs to provide exceptional, accurate, and comprehensive responses.
+Your llmfy AI Library is ready to ensure that every piece of knowledge in your system meets the highest quality standards. This will enable LLMs to provide exceptional, accurate, and comprehensive responses.
 
 Remember: **Quality isn't just a feature—it's the foundation.**
