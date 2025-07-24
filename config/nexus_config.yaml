@@ -1,0 +1,201 @@
+# Nexus AI Library Configuration
+# Quality-First Knowledge Management System
+
+# Environment: development, test, production
+environment: development
+
+# Quality Configuration
+quality:
+  # Minimum quality score for chunks (0-10)
+  threshold: 9.5
+  
+  # Automatically enhance low-quality chunks
+  auto_enhance: true
+  
+  # Strictly enforce threshold (reject if can't enhance)
+  enforce_threshold: true
+  
+  # Quality dimensions and weights
+  dimensions:
+    self_contained: 0.20
+    definitions: 0.15
+    examples: 0.20
+    structure: 0.10
+    relationships: 0.15
+    clarity: 0.10
+    completeness: 0.10
+
+# Embedding Configuration
+embeddings:
+  # Development settings (free local embeddings)
+  development:
+    provider: local
+    model: all-MiniLM-L6-v2
+    dimension: 384
+    
+  # Test settings (mix of local and cloud)
+  test:
+    provider: hybrid
+    local_model: all-MiniLM-L6-v2
+    cloud_model: text-embedding-ada-002
+    routing: quality_based  # Use cloud for high-quality content
+    
+  # Production settings (optimized hybrid)
+  production:
+    provider: hybrid
+    local_model: all-MiniLM-L6-v2
+    cloud_model: text-embedding-3-small
+    routing: intelligent
+    cost_limit_daily: 10.0  # Max $10/day for embeddings
+
+# Storage Configuration  
+storage:
+  # Development storage (local only)
+  development:
+    provider: chromadb
+    path: ./data/chromadb
+    
+  # Test storage (local only)
+  test:
+    provider: chromadb
+    path: ./data/chromadb_test
+    
+  # Production storage (hybrid)
+  production:
+    provider: hybrid
+    local:
+      type: chromadb
+      path: ./data/chromadb_prod
+    cloud:
+      type: pinecone
+      index: nexus-knowledge
+      dimension: 1536
+    routing:
+      # Store in cloud if quality > 9.7
+      quality_threshold: 9.7
+      # Store in cloud if accessed > 100 times/day
+      access_threshold: 100
+
+# Processing Configuration
+processing:
+  # Chunk settings
+  chunk_size: 1500
+  chunk_overlap: 200
+  
+  # Batch processing
+  batch_size: 100
+  
+  # Multi-modal support
+  extract_images: true
+  process_tables: true
+  
+  # Supported file types
+  supported_extensions:
+    - .md
+    - .txt
+    - .pdf
+    - .py
+    - .js
+    - .ts
+    - .json
+    - .yaml
+    - .yml
+
+# MCP Server Configuration
+mcp:
+  # Enable MCP server
+  enabled: true
+  
+  # Server settings
+  host: localhost
+  port: 8765
+  
+  # Features to expose
+  features:
+    - search_with_quality
+    - get_context
+    - quality_report
+    - cost_analysis
+    - system_health
+  
+  # Include quality metrics in responses
+  include_quality_scores: true
+  include_confidence_scores: true
+  include_cost_info: true
+
+# Monitoring Configuration
+monitoring:
+  # Enable monitoring
+  enabled: true
+  
+  # Metrics to track
+  metrics:
+    - quality_scores
+    - processing_time
+    - embedding_costs
+    - storage_usage
+    - retrieval_latency
+    - cache_hit_rate
+  
+  # Alerting thresholds
+  alerts:
+    quality_below: 9.0
+    cost_above_daily: 10.0
+    latency_above_ms: 2000
+    error_rate_above: 0.01
+
+# Cache Configuration
+cache:
+  # Enable caching
+  enabled: true
+  
+  # Cache settings
+  embedding_cache: true
+  query_cache: true
+  
+  # Cache TTL (seconds)
+  embedding_ttl: 86400  # 24 hours
+  query_ttl: 3600      # 1 hour
+  
+  # Cache size limits
+  max_embedding_cache_mb: 1000
+  max_query_cache_mb: 100
+
+# Cost Optimization
+cost_optimization:
+  # Enable cost tracking
+  track_costs: true
+  
+  # Cost limits
+  max_daily_cost: 10.0
+  max_monthly_cost: 100.0
+  
+  # Optimization strategies
+  strategies:
+    - use_local_for_development
+    - cache_embeddings
+    - batch_processing
+    - intelligent_routing
+    - compress_storage
+
+# Logging Configuration
+logging:
+  # Log level: debug, info, warning, error
+  level: info
+  
+  # Log outputs
+  outputs:
+    - console
+    - file
+  
+  # Log file settings
+  file:
+    path: ./logs/nexus.log
+    max_size_mb: 100
+    backup_count: 5
+  
+  # What to log
+  log_quality_scores: true
+  log_costs: true
+  log_errors: true
+  log_performance: true

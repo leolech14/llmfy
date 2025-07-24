@@ -1,0 +1,682 @@
+[
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nQuality Control Methods for LLM Knowledge Bases\nIntroduction: Ensuring high-quality data in a knowledge base is crucial for effective Retrieval-Augmented\nGeneration (RAG). Our current pattern-based scorer in llmfy (which rewards markdown structure, specific\nphrases like \"for example\", etc.) has proven too rigid \u2013 it even rejected The Architect\u2019s Guide to Master-Class\nUI/UX, a well-written technical guide, simply because it lacked the expected headings and keywords. This\nmismatch highlights the need for more nuanced quality control. In this analysis, we explore state-of-the-art\nmethods for evaluating knowledge base chunks, the dimensions of \u201cquality\u201d that truly impact RAG\nperformance, and how to implement a robust yet practical quality pipeline for llmfy.\n[LIST_ITEM]1. State-of-the-Art Quality Assessment in RAG Systems\nBest Practices & Industry Approaches: Modern RAG pipelines focus on retrieval performance as the\nultimate measure of quality. Leading LLM providers and vector DB companies emphasize preparing\nknowledge base chunks that maximize retrieval accuracy:\nOpenAI & Azure: Emphasize chunking documents into self-contained \u201catomic\u201d pieces of a few",
+    "metadata": {
+      "chunk_tokens": 253,
+      "chunk_total": 4,
+      "quality_score": 7.76,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nEmbedding Providers (Cohere, OpenAI embeddings): Stress using domain-specific embedding\nmodels and cleaning the text. For example, code or medical text might require embeddings tuned to\nthose domains. Garbage in = garbage out: all providers implicitly agree that removing irrelevant\nor low-quality text (boilerplate, duplicates, errors) before indexing is essential to a high-quality\nknowledge base.\nCommon Theme: Rather than hard-coded \u201cquality scores,\u201d industry leaders focus on retrieval-oriented\nevaluations \u2013 i.e. does the chunking and data prep lead to relevant chunks being retrieved for user\nqueries? In practice, they measure success via metrics like precision@k, recall@k, and downstream answer\ncorrectness . The next sections delve into what specific content qualities drive those outcomes.\n[LIST_ITEM]2. Quality Dimensions That Matter for RAG\nTraditional writing quality metrics (clarity, completeness, structure, examples, definitions, relationships) are\ngood starting points, but RAG places additional demands on each chunk. Key quality dimensions include:\nClarity & Coherence: Each chunk should be easy to understand and stick to a single topic. Clarity",
+    "metadata": {
+      "chunk_tokens": 249,
+      "chunk_total": 4,
+      "quality_score": 7.41,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nFactual Accuracy & Sources: Obviously, any chunk should be factually correct and up-to-date\n(temporal relevance). Stale or incorrect information is worse than useless in a knowledge base \u2013 it\ncan lead the LLM to confidently generate wrong answers. In domains like medical or legal, accuracy\nis paramount. Chunks in these domains are higher quality if they include citations or references to\ncredible sources (which an LLM could even quote or use to verify facts). While automated scoring of\ntruthfulness is hard, one could integrate a fact-check step (for example, using an LLM to cross-verify\na chunk against a trusted source, or ensuring the chunk itself contains a reference if it states a\nfactual claim).\nStructure & Format: Good structure (headings, lists, code blocks) still matters because it conveys\nmeaning (e.g. a list of bullet points might mean steps or key factors). Also, structure helps during\ningestion: for example, using markdown or HTML cues to split chunks along logical boundaries\n(sections, list items) rather than arbitrary cuts. Our pattern-based system was right to notice\nstructure, but too strict in requiring specific phrases. The takeaway is that structured content tends",
+    "metadata": {
+      "chunk_tokens": 264,
+      "chunk_total": 4,
+      "quality_score": 7.65,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nlaw is less useful. In medical content, citing clinical studies or including disclaimers might be a\nquality criterion, as well as using the correct medical terminology. In technical docs, things like\nincluding code outputs or screenshots could be relevant (though images are a special case). Our\nquality scoring may need domain-specific weights. For example, completeness and accuracy might\noutweigh brevity in finance (where regulations require the full context), whereas brevity and clarity\nmight be paramount in a user-facing FAQ. One-size-fits-all scoring can fail when applied to widely\ndifferent content types.\nIn summary, quality for RAG is multi-dimensional. A truly \u201cgood\u201d chunk is one that is retrievable and useful\n\u2013 it is factually correct, contains the necessary context, focuses on a single topic, and is written clearly with\nrelevant details. Next, we compare methods to evaluate these qualities.\n[LIST_ITEM]3. Evaluation Methods: Pattern-Based vs LLM-Based vs Embedding\n& Hybrid Approaches\nPattern-Based Rules (Deterministic)\nHow it works: A pattern-based system uses predefined rules or regexes to score chunks. For example, our",
+    "metadata": {
+      "chunk_tokens": 253,
+      "chunk_total": 4,
+      "quality_score": 7.41,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nfirst-pass filter \u2013 e.g., eliminate chunks that are too short or empty, or flag chunks missing any\nalphanumeric characters (which might be OCR errors or boilerplate).\nWhen it fails: With diverse, unstructured sources. Anything that doesn\u2019t fit the preconceived mold will be\nmis-scored. Also, patterns can\u2019t evaluate meaning. They can\u2019t tell if a statement is factual or if a code sample\nactually works. And they struggle with context: a rule might check if a chunk contains a definition, but it\nwon\u2019t know if the definition is actually correct or relevant.\nLLM-Based Evaluation\nHow it works: Use a large language model (GPT-4, Claude, etc.) to read each chunk and give a quality rating\nor classification. This can be zero-shot (prompt the LLM with instructions on what a \u201cgood\u201d chunk looks like),\nfew-shot (provide examples of good vs bad chunks), or fine-tuned (train a smaller model on labeled data as\na quality classifier).\nPros: LLMs can capture nuances and semantics that hard rules miss. They effectively \u201cunderstand\u201d the",
+    "metadata": {
+      "chunk_tokens": 246,
+      "chunk_total": 5,
+      "quality_score": 7.41,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nWhen it fails: If done na\u00efvely at scale \u2013 it will blow your budget and slow down ingestion drastically. It also\nmight struggle with highly specialized content unless you use domain-specific models or few-shot examples\n(GPT-4 might not know how to evaluate the quality of, say, a chunk of assembly code documentation\nwithout some help). Also, if you ask the LLM to multi-task (e.g., \u201cScore 10 different aspects at once\u201d), the\nquality of its evaluation might drop or become inconsistent.\nEmbedding-Based Metrics\nHow it works: Uses vector embeddings (usually the same ones used for retrieval) to derive quality signals.\nThis is more experimental, but a few ideas include: - Semantic Cohesion: Compute the cosine similarity\nbetween all sentence embeddings within a chunk. If the average similarity is very low, the chunk might be\nabout multiple topics (low coherence). A highly coherent chunk would have its sentences or paragraphs\nclosely clustered in embedding space. - Uniqueness/Outlier Detection: Embed each chunk and measure\nits similarity to the rest of the corpus. Chunks that are nearly duplicates of others could be penalized (low",
+    "metadata": {
+      "chunk_tokens": 252,
+      "chunk_total": 4,
+      "quality_score": 7.42,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nWhen it fails: If used blindly. One must be cautious interpreting embedding distances. They are great for\nrelevance, but \u201cquality\u201d is more than just vector math. These methods won\u2019t understand linguistic quality or\nfactual correctness.\nHybrid Approaches\nThe consensus in recent literature and industry practice is to combine methods to get the best of each: -\nUse pattern-based or other lightweight checks to filter out the obvious bad (empty chunks, extremely\nshort chunks, those lacking any domain terms, etc.). These run cheaply on all data. - Then apply LLM-based\nevaluation selectively \u2013 e.g., only on chunks that scored in a \u201cgrey zone.\u201d Our llmfy scorer could adopt this:\nif a chunk gets, say, 8/10 by rules (just below the 9.5 threshold), it\u2019s probably worth a second look. We could\nask GPT-3.5 or Claude to give an independent score. If the LLM says \u201cactually, this chunk is well-written and\nrelevant,\u201d we boost its score and include it. This way, we don\u2019t waste LLM calls on chunks that are clearly",
+    "metadata": {
+      "chunk_tokens": 248,
+      "chunk_total": 4,
+      "quality_score": 7.74,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nMethod Pros Cons Use Cases\nLLM-Based\nDeep semantic\nunderstanding; can\nevaluate relevance, clarity,\nfactuality like a human.\nHigh cost; slower; black-\nbox reasoning; needs\ncareful prompt/design\n.\nSecond-pass scoring;\ncomplex quality aspects;\nlow-volume or critical\ndata.\nEmbedding-\nBased\nUses existing vectors;\ncatches duplicates or off-\ntopic chunks; measures\ncoherence indirectly.\nIndirect proxies; can\nmisidentify rare-but-\nuseful info as outlier; not\na standalone solution.\nSupplementary signals;\ndeduplication; identify\nchunking issues.\nHybrid\nBalances precision and\nrecall; cost-efficient by\nfocusing expensive checks\nwhere needed.\nAdded complexity in\npipeline; needs tuning of\nthresholds for when to\ntrigger LLM or human\nreview.\nHigh-quality pipelines\n(like llmfy) needing\nscalability and reliability.\nHuman\nReview\nUltimate judgment, can\ncatch subtle issues and\ndomain nuances.\nVery slow, expensive, not\nscalable to large KB;\nsubjective variations.\nFinal sign-off for critical",
+    "metadata": {
+      "chunk_tokens": 241,
+      "chunk_total": 4,
+      "quality_score": 7.35,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\ngrounded in the provided chunks. If your chunks are low quality, either the right info isn\u2019t\nretrieved (so answer might be wrong or a hallucination), or the LLM is forced to work with poor text\n(leading to confusion or errors). \nThere have been case studies where improving the knowledge base quality showed clear downstream\nbenefits. For instance, LlamaIndex\u2019s evaluation blog measured how adjusting chunk size affected answer\ncorrectness: smaller chunks improved faithfulness (fewer hallucinations) up to a point, because the retrieved\ncontext was more on-target. However , too small and some answers became incomplete (relevancy\ndropped) . They used GPT-4 to evaluate these metrics and found an optimal chunk size that balanced\nboth. This indicates a strong relationship between chunk quality (in terms of granularity) and the precision/\nrecall trade-off of retrieval, which in turn affects answer accuracy.\nStudies on thresholds: While there isn\u2019t a single \u201cquality score threshold X yields optimal\nperformance\u201d across all cases, it\u2019s recommended to empirically validate any threshold. For example,",
+    "metadata": {
+      "chunk_tokens": 241,
+      "chunk_total": 4,
+      "quality_score": 7.41,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n[LIST_ITEM]5. Implementation Considerations (Speed, Cost, Domain, Multi-\nModal)\nDesigning a quality control pipeline means balancing rigor with practicality:\nPerformance vs. Thoroughness: An ideal evaluation might combine multiple methods (as we\ndescribed) but we must keep ingestion fast. Our proposal is a tiered hybrid system:\nLevel 1: Pattern/heuristic checks on all chunks (virtually instant, cost $0). These eliminate the worst\ncontent and score others roughly.\nLevel 2: LLM-based scoring on a subset. Only chunks that are borderline or unclear go through this.\nThis could be ~10-20% of chunks. Using a cheaper LLM (like an uncensored Claude model or GPT-3.5\nwith a specialized prompt) keeps costs low. We estimate this two-tier approach would add only a\nsmall latency (maybe 1 second per borderline chunk, which is a fraction of total chunks) and a\nmanageable cost (a few dollars per month for a moderate corpus). This way, 99% of chunks are\nprocessed in seconds, and only a small fraction incur an LLM call.",
+    "metadata": {
+      "chunk_tokens": 251,
+      "chunk_total": 4,
+      "quality_score": 7.94,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\ndomain tweaks can be implemented as additional pattern rules or as prompt conditioning for LLM\neval (e.g., tell the LLM \u201cyou are reviewing a medical knowledge base; ensure the chunk is medically\nfactual and sourced\u201d). Using domain-specific embedding models can also improve the initial quality \u2013\ne.g., OpenAI has an embedding model for code, one for text, etc. \u2013 matching the model to the\ncontent type yields better vector representations, indirectly boosting retrieval performance.\nCost Management: If using LLMs, prefer cheaper models for volume and save GPT-4 for where it\nreally matters. Also consider fine-tuning a smaller model if our data is large. The ARES framework is\ninstructive here: instead of calling GPT-4 forever , they generate synthetic data and fine-tune a 400M\nparam model to act as a judge. We could similarly gather a labeled set of chunks (some good,\nsome bad) and train a lightweight classifier . That incurs a one-time training cost but near-zero cost\nper chunk after . This classifier could encapsulate the patterns and the LLM-like judgments, serving as\na quality proxy.",
+    "metadata": {
+      "chunk_tokens": 253,
+      "chunk_total": 4,
+      "quality_score": 7.33,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n[LIST_ITEM]6. Alternative Quality Evaluation Frameworks and Tools\nIt\u2019s worth noting some emerging frameworks aimed at assessing RAG and knowledge base quality:\nRAGAS (Retrieval Augmented Generation Assessment): A framework introduced in late 2023 to\nevaluate RAG pipelines without human labels. RAGAS defines a suite of metrics to score different\naspects of RAG. For knowledge base quality, its relevant metrics are Context Recall and Context\nPrecision \u2013 essentially measuring if retrieved chunks contain the necessary info and little else. It\nuses zero-shot LLM prompts to score these (alongside metrics for answer correctness like\nFaithfulness and Answer Relevance). In practice, RAGAS can be integrated into dev workflows (it has\nintegrations with LangChain and LlamaIndex) to give a quantitative score of how good your\nretrieval+KB is. While RAGAS is more about evaluating a whole system, we can repurpose the ideas:\nfor example, use its context precision/recall scoring as a way to benchmark different chunking or\nfiltering strategies on a validation set. If adding a quality filter improves context precision without\nhurting context recall, that\u2019s a win.",
+    "metadata": {
+      "chunk_tokens": 262,
+      "chunk_total": 5,
+      "quality_score": 7.470000000000001,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\njudge if the top retrieved chunk adequately covers the answer . If not, maybe the chunking is bad or\nthe chunk content is insufficient. This is more of a dev-phase tool, but it\u2019s useful for comparing\ndifferent ingestion configurations.\nLlamaIndex \u201cResponse Evaluation\u201d: As mentioned, LlamaIndex has built-in evaluators like\nFaithfulnessEvaluator and RelevancyEvaluator which use GPT-4 to grade how well an\nanswer uses the source text. In their blog example, they varied chunk size and used these\nmetrics to find the optimal setting. These evaluators essentially measure if the source chunks\ncontained the answer (relevancy) and if the answer stayed true to the source (faithfulness). We could\nuse a similar approach to evaluate different quality scoring methods. For example, run the pipeline\nwith pattern-only vs hybrid scoring, then for a set of questions measure the faithfulness of answers.\nIf hybrid scoring yields higher faithfulness (i.e., fewer hallucinations), that validates the approach.\nOther frameworks & standards: In specialized industries, there are often standards for\ndocumentation quality (e.g., documentation style guides, or knowledge base article checklists). While",
+    "metadata": {
+      "chunk_tokens": 255,
+      "chunk_total": 4,
+      "quality_score": 7.51,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nWe can use a simple heuristic like average sentence length or even a GPT-3.5 assessment of clarity. - No\nredundancy: Implement a duplicate check \u2013 e.g., hash the chunk text or compare embeddings to remove\nnear-duplicates. - Length and format: Set a reasonable length range (e.g. 50 to 300 tokens) as the sweet\nspot, with exceptions for lists or tables. Extremely short chunks likely lack context; extremely long ones\nmight need splitting.\nWe should update the pattern rules to be more inclusive. Instead of demanding certain phrases, we can\nlook for variety: e.g., a chunk might score well if it has either a header or contains multiple sentences of\nexplanatory text or has a list \u2013 there are many forms of quality. The key is not to penalize a well-written\nparagraph just because it isn\u2019t in a list.\n(b) Implement the Hybrid Scoring System: As discussed, use the pattern-based score as a baseline and\ninvoke an LLM for second opinion on mid-scoring chunks. For example, any chunk scoring between, say, 7",
+    "metadata": {
+      "chunk_tokens": 245,
+      "chunk_total": 5,
+      "quality_score": 8.040000000000001,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nuse Grid instead of Flexbox?\u201d \u2013 and see if our retrieval picks up the relevant chunk. If our quality filter had\nremoved that chunk (thinking it was low quality), that\u2019s a red flag with immediate impact.\n(g) User-Control and Transparency: Provide an option in llmfy to output the quality scores and the\nreasoning (at least at a high level). Maybe an advanced mode where a user can see \u201cChunk X \u2013 Score 8.2 \u2013\n(Structure: 2.0/3, Clarity: 3.0/3, LLM check: 3.2/4) \u2013 PASSED\u201d or \u201cChunk Y \u2013 Score 5.1 \u2013 (Too short; no clear\ncontext) \u2013 REJECTED.\u201d This builds trust and also lets the user override if needed. Perhaps an interface to\nwhitelist certain documents or chunks even if they don\u2019t meet the automated threshold (because the user\nknows they\u2019re important).\n(h) Continual Learning: As we deploy the new quality scorer , monitor its decisions. If we find it\u2019s still\nmissing some high-quality content (false negatives) or letting some low-quality through (false positives), we",
+    "metadata": {
+      "chunk_tokens": 258,
+      "chunk_total": 5,
+      "quality_score": 7.98,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 0,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nIntroducing Contextual Retrieval \\ Anthropic\nhttps://www.anthropic.com/news/contextual-retrieval\nBest practices for using Azure OpenAI On Your Data - Azure OpenAI in Azure AI Foundry\nModels | Microsoft Learn\nhttps://learn.microsoft.com/en-us/azure/ai-foundry/openai/how-to/on-your-data-best-practices\nChunking Strategies for LLM Applications | Pinecone\nhttps://www.pinecone.io/learn/chunking-strategies/\nLate Chunking: Balancing Precision and Cost in Long Context Retrieval | Weaviate\nhttps://weaviate.io/blog/late-chunking\nRAG Evaluation: Don\u2019t let customers tell you first | Pinecone\nhttps://www.pinecone.io/learn/series/vector-databases-in-production-for-busy-engineers/rag-evaluation/\nEvaluating Chunking Strategies for Retrieval | Chroma Research\nhttps://research.trychroma.com/evaluating-chunking\n[2309.15217] RAGAS: Automated Evaluation of Retrieval Augmented Generation\nhttps://ar5iv.labs.arxiv.org/html/2309.15217v2",
+    "metadata": {
+      "chunk_tokens": 255,
+      "chunk_total": 4,
+      "quality_score": 8.165000000000001,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nultimate measure of quality. Leading LLM providers and vector DB companies emphasize preparing\nknowledge base chunks that maximize retrieval accuracy:\nOpenAI & Azure: Emphasize chunking documents into self-contained \u201catomic\u201d pieces of a few\nhundred tokens each. In Azure\u2019s OpenAI on Your Data, documents are auto-chunked to ~1024\ntokens by default, and a strictness filter is applied during retrieval to drop low-relevance chunks\n. (Notably, Azure warns that if the filter is too strict, relevant chunks may be thrown out,\nunderscoring the importance of balancing quality thresholds.)\nAnthropic: Introduced Contextual Retrieval to improve chunk utility. They found that traditional\nchunking can \u201cdestroy context\u201d if chunks lack key details like subject or timeframe. By\nprepending essential context (e.g. adding the company name and quarter to a financial snippet),\nthey cut failed retrievals by up to 67% \u2013 a massive boost in accuracy that directly translates to\nbetter answers. This shows that contextual completeness of chunks is a critical quality factor .\nPinecone: Recommends tailoring chunk strategies to the use-case. Key considerations include",
+    "metadata": {
+      "chunk_tokens": 250,
+      "chunk_total": 4,
+      "quality_score": 7.37,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\ngood starting points, but RAG places additional demands on each chunk. Key quality dimensions include:\nClarity & Coherence: Each chunk should be easy to understand and stick to a single topic. Clarity\nensures the LLM can interpret it correctly. Semantic coherence (the sentences in the chunk are\nrelated) is especially important \u2013 if a chunk rambles through unrelated points, its embedding will be\na poor match to any query. Cohere and others suggest grouping sentences by similarity so that each\nchunk represents one coherent idea. High coherence means higher semantic similarity within\nthe chunk, which tends to improve retrieval relevance.\nContext Independence (Self-Containment): Perhaps the most crucial RAG-specific quality. A chunk\nmust contain enough context to be understood in isolation. If vital info like \u201cwho/what/when\u201d is\nmissing, the vector search may not retrieve it, or the LLM may mis-use it. Anthropic\u2019s example above\n(adding \u201cACME Corp in Q2 2023\u201d to a revenue snippet) illustrates how adding context dramatically\nimproves a chunk\u2019s usefulness. Each chunk should be a standalone, atomic piece of knowledge",
+    "metadata": {
+      "chunk_tokens": 253,
+      "chunk_total": 4,
+      "quality_score": 7.37,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n(sections, list items) rather than arbitrary cuts. Our pattern-based system was right to notice\nstructure, but too strict in requiring specific phrases. The takeaway is that structured content tends\nto be higher quality for retrieval when the structure reflects semantic meaning. A chunk that is just a\nraw paragraph can be fine; but a chunk that corresponds to a section titled \u201cDefinition\u201d or a code\nexample block may be easier for an LLM to use appropriately. That said, structure should not be\nconflated with quality \u2013 well-written narrative text can be excellent for LLMs even if it doesn\u2019t have\nexplicit headings.\nExamples & Explanations: Chunks with concrete examples or analogies can enhance\nunderstanding, especially for technical content. They provide additional semantic hooks (if a user\nquery references the example, that chunk becomes relevant). Our scorer looked for the phrase \u201cfor\nexample,\u201d which was too naive \u2013 examples matter , but they might be given without that exact\nphrasing. Instead, we should value chunks that demonstrate concepts in action. E.g., a chunk of a UX\nguide that actually shows a bad vs. good design snippet is high value. In terms of RAG performance,",
+    "metadata": {
+      "chunk_tokens": 262,
+      "chunk_total": 4,
+      "quality_score": 7.25,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n& Hybrid Approaches\nPattern-Based Rules (Deterministic)\nHow it works: A pattern-based system uses predefined rules or regexes to score chunks. For example, our\ncurrent scorer adds points if a chunk contains markdown headings, bullet lists, known cue phrases (\u201cfor\nexample\u201d, \u201crefers to\u201d, etc.), or specific tokens like code snippets. It\u2019s essentially a checklist \u2013 the more boxes\nticked, the higher the score.\nPros: It\u2019s fast, transparent, and cost-free (after initial setup). Deterministic rules run in O(1) time per\nchunk and can process thousands of chunks per second with no API costs. The results are consistent and\nexplainable: if a chunk scored 5/10, we can pinpoint which rule it failed. Pattern checks are great for\nenforcing minimum standards (e.g., \u201cevery chunk must have at least one technical term or it\u2019s probably\nfluff\u201d). They can also catch obvious bad data (like if a chunk is just a single sentence with no punctuation \u2013\nlikely low quality).\nCons: Rigid rules lead to false negatives and false positives. High-quality content might be written in",
+    "metadata": {
+      "chunk_tokens": 250,
+      "chunk_total": 4,
+      "quality_score": 7.73,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\na quality classifier).\nPros: LLMs can capture nuances and semantics that hard rules miss. They effectively \u201cunderstand\u201d the\ncontent. For example, an LLM can judge that the UI/UX guide chunks are actually highly informative and\nclearly written, even if they lack explicit headers \u2013 something our pattern scorer failed to grasp. LLM-based\nevaluation can incorporate many quality dimensions in one go: coherence, clarity, factual tone,\ncompleteness, etc., just by how you design the prompt. Recent research shows LLM evaluators align well\nwith human judgments on dimensions like relevance and factuality. The RAGAS framework, for instance,\nuses GPT-4 to score chunks on metrics like Context Relevance and Faithfulness on a 1\u201310 scale, and found this\nzero-shot approach correlates strongly with human ratings. In short, LLMs can be very reliable judges\nof chunk quality when guided properly.\nCons:Cost and speed. Running an LLM (especially GPT-4) on every chunk is expensive and slow. E.g.,",
+    "metadata": {
+      "chunk_tokens": 234,
+      "chunk_total": 5,
+      "quality_score": 7.715,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nclosely clustered in embedding space. - Uniqueness/Outlier Detection: Embed each chunk and measure\nits similarity to the rest of the corpus. Chunks that are nearly duplicates of others could be penalized (low\nunique info), whereas an outlier chunk might be either very niche useful info or completely irrelevant \u2013\nfurther inspection needed. Some pipelines remove near-duplicate embeddings to reduce index size and\nimprove precision. - Semantic Density Metric: Using the embedding, one could measure something like\nthe norm of the vector or information content. (This is not straightforward \u2013 e.g., higher norm might\nindicate a very specific chunk vs. lower norm a generic one, depending on the embedding model). Research\nis ongoing on defining such metrics.\nAnother embedding-based approach is semantic chunking for quality: instead of evaluating a finished\nchunk, this method forms chunks by clustering semantically similar sentences. The idea is a well-formed\nchunk is basically a cluster of related sentences. Chunks formed this way inherently maximize coherence and\nrelatedness. For example, Kamradt\u2019s Semantic Chunker groups sentences by similarity so that each",
+    "metadata": {
+      "chunk_tokens": 245,
+      "chunk_total": 4,
+      "quality_score": 7.35,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nrelevant,\u201d we boost its score and include it. This way, we don\u2019t waste LLM calls on chunks that are clearly\ngood (rules gave 10) or clearly terrible (rules gave 2), but we catch the borderline cases. This human-in-the-\nloop analog (except the \u201chuman\u201d is an LLM) can significantly improve recall of good content with minimal\ncost. For example, if 20% of chunks are borderline and we check those with a ~$0.002 LLM call, the cost is\ntrivial compared to blindly LLM-scoring 100% of chunks. - Human-in-the-loop: There\u2019s still a place for actual\nhuman review in quality control, especially for critical domains. Human experts might review a sample of\nchunks or any chunk the automated system is unsure about (perhaps anything where the rule score and\nLLM score wildly disagree, or new content from an untrusted source). Humans can also help continually\nrefine the evaluation criteria by seeing false positives/negatives and updating rules or LLM prompts.\nFeedback loops: Another hybrid angle is to use retrieval tests to refine quality scoring. For example,",
+    "metadata": {
+      "chunk_tokens": 251,
+      "chunk_total": 4,
+      "quality_score": 7.9,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nscalability and reliability.\nHuman\nReview\nUltimate judgment, can\ncatch subtle issues and\ndomain nuances.\nVery slow, expensive, not\nscalable to large KB;\nsubjective variations.\nFinal sign-off for critical\nknowledge (e.g., medical\nguidelines).\n[LIST_ITEM]4. Quality vs. Retrieval Performance\nA central question: does improving the \u201cquality score\u201d of chunks actually lead to better retrieval and better\nanswers? Research and experience suggest yes \u2013 but only if your quality metrics align with retrieval\nneeds. Some findings and considerations:\nBetter chunks = Better retrieval: The Chroma research study demonstrated that a well-chosen\nchunking strategy can boost retrieval recall by up to 9%. That\u2019s significant \u2013 in a QA system, 9%\nmore relevant info retrieved can mean the difference between a correct answer and a miss. They\nshowed that certain chunk configurations (like semantically coherent clusters or LLM-guided chunks)\noutperformed naive fixed-size splitting in both accuracy and efficiency. In essence, when\nchunks are higher quality (more self-contained and topically focused), the vector search finds the\nright information more often.",
+    "metadata": {
+      "chunk_tokens": 252,
+      "chunk_total": 4,
+      "quality_score": 7.33,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nStudies on thresholds: While there isn\u2019t a single \u201cquality score threshold X yields optimal\nperformance\u201d across all cases, it\u2019s recommended to empirically validate any threshold. For example,\nyou might run a set of queries on the knowledge base filtered at 5/10, 7/10, 9/10 quality and see\nwhich yields best QA results. Often, the relationship is not linear \u2013 beyond a certain point, higher\nquality scores give diminishing returns. A chunk that scores 8 vs 9 by some metric might make no\ndifference to the LLM\u2019s ability to answer , as long as it\u2019s above a sufficiency threshold. But chunks\nbelow, say, 3/10 might actively hurt (they could be irrelevant or incorrect). So one practical approach:\nset a lower bar to weed out truly bad chunks, and don\u2019t obsess over micro-scoring the rest \u2013 instead\nfocus on whether including a chunk helps answer questions correctly.\nContext relevance vs answer correctness: RAGAS metrics show that Context Precision (how much of\nretrieved text was actually needed) and Context Recall (did we retrieve all that was needed) are",
+    "metadata": {
+      "chunk_tokens": 249,
+      "chunk_total": 4,
+      "quality_score": 8.05,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nmanageable cost (a few dollars per month for a moderate corpus). This way, 99% of chunks are\nprocessed in seconds, and only a small fraction incur an LLM call.\nLevel 3 (optional): Human or advanced LLM (GPT-4) review for critical content. For example, if a\nchunk is going to be used in a medical advice bot, perhaps have a human verify it. This is offline and\ncan be done asynchronously.\nWe can implement this in code as a SmartQualityScorer \u2013 pseudo-code: \nscore= pattern_score(chunk)\nif6.0<=score< 9.5: # uncertain range\nllm_score= llm_eval(chunk) # e.g., Claude instant or GPT-3.5\nscore= (score+ llm_score) / 2 # combine or just use llm_score\nThis ensures speed and low cost for most chunks, while not letting genuinely good chunks slip through due\nto arbitrary rules.\nAdjustable Thresholds: Different projects may set different quality bars. We should allow the 0\u201310\ncutoff to be configurable. For internal knowledge bases, maybe we only want to drop truly awful",
+    "metadata": {
+      "chunk_tokens": 259,
+      "chunk_total": 4,
+      "quality_score": 8.24,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nsome bad) and train a lightweight classifier . That incurs a one-time training cost but near-zero cost\nper chunk after . This classifier could encapsulate the patterns and the LLM-like judgments, serving as\na quality proxy.\nMulti-Modal and Complex Data: PDFs with images, tables, diagrams present special challenges.\nOur quality scoring should not inadvertently penalize chunks that are primarily tabular or figure text.\nFor example, a chunk that is a table of specifications might not have long sentences or \u201cfor example\u201d\nphrases \u2013 our old scorer might give it a low score. But that table could be extremely valuable to\ninclude. Azure\u2019s guidance suggests using specialized ingestion for tables (like a layout model);\nonce processed, the text might be in a structured format (CSV or list) \u2013 we should handle that\ngracefully. Possibly, we detect if a chunk is part of a table or code block (via metadata) and adjust\nscoring (maybe don\u2019t require prose-style features for those). Similarly for images: If an image has a\ncaption or alt text, include that as a chunk with appropriate metadata (e.g., \u201cFigure: screenshot of",
+    "metadata": {
+      "chunk_tokens": 252,
+      "chunk_total": 4,
+      "quality_score": 7.35,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nfor example, use its context precision/recall scoring as a way to benchmark different chunking or\nfiltering strategies on a validation set. If adding a quality filter improves context precision without\nhurting context recall, that\u2019s a win.\nARES: An automated RAG evaluation framework from Stanford (2024) that goes a step further by\ngenerating synthetic Q&A data and fine-tuning \u201cLLM judges\u201d to evaluate RAG components.\nARES trains smaller models to predict context relevance, answer faithfulness, etc., by creating a\npseudo-dataset of queries and relevant/non-relevant passages (using round-trip retrieval to ensure\nthe synthetic queries have known relevant chunks). The result is a set of classifiers that can score\nretrieval results quickly without calling a big LLM each time. This is a promising approach for\nscaling evaluation. If we wanted to create an internal \u201cquality model\u201d for llmfy, we could use a similar\napproach: generate synthetic queries for each chunk (or each document) to see if the chunk is\nretrievable and helpful, then train a model to predict quality from that. This is complex, but it",
+    "metadata": {
+      "chunk_tokens": 255,
+      "chunk_total": 5,
+      "quality_score": 7.41,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nOther frameworks & standards: In specialized industries, there are often standards for\ndocumentation quality (e.g., documentation style guides, or knowledge base article checklists). While\nnot tailored to LLMs, adhering to them can indirectly improve LLM performance. For example, a well-\nknown style guide might insist on expanding acronyms on first use, or including an \u201cUpdated on\n[date]\u201d note. These practices ensure clarity and temporal context, which help LLMs. We might\nincorporate some of these rules in domain-specific scoring. There\u2019s also the notion of knowledge\ngraphs and using them to ensure coverage \u2013 but that veers into knowledge base construction more\nthan just chunk quality. \nContent Moderation and Safety filters: Not exactly \u201cquality\u201d in the sense of helpfulness, but any\npipeline should also filter out toxic, biased, or disallowed content from the knowledge base. OpenAI,\nAnthropic, etc., likely apply moderation filters on ingested data if it\u2019s user-provided. It\u2019s worth\nmentioning that a chunk could be perfectly relevant but contain hate speech or privacy-sensitive",
+    "metadata": {
+      "chunk_tokens": 243,
+      "chunk_total": 4,
+      "quality_score": 7.550000000000001,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n(b) Implement the Hybrid Scoring System: As discussed, use the pattern-based score as a baseline and\ninvoke an LLM for second opinion on mid-scoring chunks. For example, any chunk scoring between, say, 7\nand 9 by rules gets fed to a prompt like: \u201cYou are an expert reading a knowledge base chunk. Please rate its\nquality for helping answer questions on a scale of 1-10, considering clarity, completeness, and relevance.\u201d Using a\nfast model (Claude-instant or GPT-3.5) with temperature 0 will give a consistent score. We then can\naverage or otherwise combine this with the pattern score. Empirically, we\u2019d adjust this system to match our\ndesired calibration (maybe we trust the LLM more, so we take its score primarily, but still ensure we don\u2019t go\nbelow certain rule-based minimums).\n(c) Domain Awareness: Incorporate a step where the user or the document metadata can specify the\ndomain, which toggles domain-specific rules. For instance, if a document is a \u201cdesign guide\u201d (like The",
+    "metadata": {
+      "chunk_tokens": 244,
+      "chunk_total": 5,
+      "quality_score": 8.06,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n(h) Continual Learning: As we deploy the new quality scorer , monitor its decisions. If we find it\u2019s still\nmissing some high-quality content (false negatives) or letting some low-quality through (false positives), we\nshould refine it. This could mean adding a new pattern (maybe we discover that dialogue transcripts are\nflagged low due to no structure, but actually can be useful \u2013 we might add rules to better score Q&A style\ntext), or adjusting the LLM prompt. It could also mean occasionally retraining a model if we go that route.\n(i) Multi-Modal Handling: Integrate with parsing tools (like Unstructured.io library or similar) to\nintelligently chunk PDFs with images and tables. For images, perhaps extract any text (OCR if necessary)\nand treat that as a chunk with a label. We won\u2019t have the LLM \u201cscore an image\u201d per se, but we might have it\nscore the caption text. For tables, ensure they aren\u2019t split into nonsense. Possibly convert small tables to\nmarkdown tables in the chunk text for better preservation (and the LLM can read it at query time). Mark",
+    "metadata": {
+      "chunk_tokens": 251,
+      "chunk_total": 5,
+      "quality_score": 7.15,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 1,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n[2309.15217] RAGAS: Automated Evaluation of Retrieval Augmented Generation\nhttps://ar5iv.labs.arxiv.org/html/2309.15217v2\nAn Overview on RAG Evaluation | Weaviate\nhttps://weaviate.io/blog/rag-evaluation\n[2505.21700] Rethinking Chunk Size For Long-Document Retrieval\nhttps://arxiv.org/abs/2505.21700\nContextual chunking strategies that improve RAG performance\nhttps://agathon.ai/insights/contextual-chunking-strategies-that-improve-rag-performance\nEvaluating the Ideal Chunk Size for a RAG System using LlamaIndex \u2014 LlamaIndex - Build\nKnowledge Assistants over your Enterprise Data\nhttps://www.llamaindex.ai/blog/evaluating-the-ideal-chunk-size-for-a-rag-system-using-llamaindex-6207e5d3fec5\n[2309.15217] Ragas: Automated Evaluation of Retrieval Augmented Generation\nhttps://arxiv.org/abs/2309.15217\nSelf-Reflective Retrieval-Augmented Generation (SELF-RAG)",
+    "metadata": {
+      "chunk_tokens": 261,
+      "chunk_total": 4,
+      "quality_score": 8.125,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nbetter answers. This shows that contextual completeness of chunks is a critical quality factor .\nPinecone: Recommends tailoring chunk strategies to the use-case. Key considerations include\ndocument size/structure, the embedding model\u2019s domain, query complexity, and end-task (search vs.\nQA vs. agent) . Pinecone advises starting with simple fixed-size chunks and then iterating,\npossibly using content-aware splitting by headings, code blocks, etc., to ensure each chunk\npreserves meaningful structure. They also highlight that embedding very large texts can\ndilute important details, whereas smaller chunks focus on specific meaning \u2013 reinforcing that\nconcise, focused chunks improve retrieval quality.\nWeaviate: Explores advanced approaches like \u201clate chunking\u201d which retrieve larger passages first\nand then dynamically chunk them. This technique aims to balance precision and cost in long\ndocuments \u2013 essentially acknowledging that one size (or one stage) of chunking may not suit all\nscenarios. Weaviate\u2019s blog also notes the need for special handling of multi-modal data (e.g. keeping\ntables intact by adjusting chunk size) to avoid losing critical info.\n\u2022 \n1\n2\n3 4\n\u2022",
+    "metadata": {
+      "chunk_tokens": 256,
+      "chunk_total": 4,
+      "quality_score": 7.590000000000001,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n(adding \u201cACME Corp in Q2 2023\u201d to a revenue snippet) illustrates how adding context dramatically\nimproves a chunk\u2019s usefulness. Each chunk should be a standalone, atomic piece of knowledge\n(e.g. including the subject it refers to, not just a pronoun or vague reference).\nCompleteness & Granularity: Striking the right balance in chunk size is key. Chunks should be\ncomplete enough to answer a specific query (contain all the info for a concept), but not so large that\nthey include extraneous material. A study by Chroma found that chunking strategy alone caused up\nto 9% difference in recall during retrieval. Too fine-grained (tiny chunks) can hurt completeness\n\u2013 e.g. a definition split into two chunks might result in only half being retrieved. Too coarse (huge\nchunks) can dilute relevance \u2013 the query term might be buried and the chunk not retrieved or it\nmight bring lots of irrelevant text. Many frameworks recommend a few hundred tokens per chunk as\na rule of thumb, then refine from there.\nSemantic Density: This refers to the amount of actual information per token. High-quality chunks",
+    "metadata": {
+      "chunk_tokens": 253,
+      "chunk_total": 4,
+      "quality_score": 7.33,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nphrasing. Instead, we should value chunks that demonstrate concepts in action. E.g., a chunk of a UX\nguide that actually shows a bad vs. good design snippet is high value. In terms of RAG performance,\nexamples can act as additional context that makes an answer more comprehensive when the LLM\nuses that chunk.\nRelationships and Linkage: High-quality knowledge bases often explicitly link related concepts\n(think: \u201cX is related to Y,\u201d or \u201cSee also: ...\u201d). This can be useful for retrieval if the query is about a\nrelationship. However , for chunk quality we must be careful: if a chunk tries to capture too many\nrelationships at once, it could become unfocused. It might be better to keep one relationship per\nchunk. Nonetheless, including contextual links (like mentioning a broader category or a prerequisite\ntopic) can help an LLM disambiguate. For example, a chunk about a Python library should mention\nit\u2019s a Python tool \u2013 so if the query is \u201cHow to use X in Python,\u201d the chunk is retrievable. These little\nconnections improve recall.",
+    "metadata": {
+      "chunk_tokens": 242,
+      "chunk_total": 4,
+      "quality_score": 7.5,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nlikely low quality).\nCons: Rigid rules lead to false negatives and false positives. High-quality content might be written in\nnatural prose that doesn\u2019t match the specific patterns (our UI/UX guide case is a prime example \u2013 it was\nexcellent content but mostly narrative paragraphs, so the scorer unfairly gave it ~4/10). Conversely, a\nmediocre chunk could artificially inflate its score by formatting itself to fit the rules without actually saying\nanything useful \u2013 e.g. a chunk that says:",
+    "metadata": {
+      "chunk_tokens": 117,
+      "chunk_total": 4,
+      "quality_score": 7.27,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nof chunk quality when guided properly.\nCons:Cost and speed. Running an LLM (especially GPT-4) on every chunk is expensive and slow. E.g.,\nevaluating 100 chunks with GPT-4 (assuming ~500 tokens each) might cost on the order of $0.03\u2013$0.06, and\ntake several seconds \u2013 not terrible in isolation, but scale that to millions of chunks and it\u2019s infeasible. One\nanalysis estimated about $3 to evaluate 100 queries worth of results with GPT-4; evaluating every\nchunk in a large corpus would be far more. Cheaper models (GPT-3.5 or Claude Instant) can be used, but\ntheir judgments might be less consistent. There\u2019s also variability \u2013 LLM outputs can be non-deterministic\nunless temperature 0 is used, and even then minor variations can occur . Another con: lack of\ntransparency. If an LLM gives a chunk an 8/10 score, it\u2019s hard to precisely know why. You can ask it for\nreasoning, but that\u2019s another layer of complexity.",
+    "metadata": {
+      "chunk_tokens": 247,
+      "chunk_total": 5,
+      "quality_score": 7.95,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nchunk is basically a cluster of related sentences. Chunks formed this way inherently maximize coherence and\nrelatedness. For example, Kamradt\u2019s Semantic Chunker groups sentences by similarity so that each\nchunk is topically tight. If a chunk needed too many different clusters to form, it\u2019s probably covering too\nmany ideas and could be split.\nPros: Embedding methods are automated and scalable. They piggyback on the vector representations you\nalready have. They can catch issues like duplicates or off-topic chunks without any language understanding\nin the classical sense. For instance, if one chunk\u2019s embedding is nearly orthogonal to all your queries\u2019\nembeddings during testing, it might contain content that\u2019s not relevant to any real use-case (maybe an\nirrelevant appendix), suggesting low value.\nCons: These metrics are indirect and require calibration. A chunk could be unique (outlier) because it\ncontains crucial but rare info, not because it\u2019s bad. Or a chunk could be internally cohesive but still useless\n(10 sentences all about nothing important). So you can\u2019t rely solely on an embedding metric to accept/reject",
+    "metadata": {
+      "chunk_tokens": 242,
+      "chunk_total": 4,
+      "quality_score": 7.61,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nrefine the evaluation criteria by seeing false positives/negatives and updating rules or LLM prompts.\nFeedback loops: Another hybrid angle is to use retrieval tests to refine quality scoring. For example,\ntake a set of representative queries, run the retrieval on your knowledge base, and see which chunks\nget retrieved and lead to correct answers vs. wrong answers. Chunks that consistently show up in\nwrong answers might be low-quality (perhaps they contain misleading text). This is essentially using \nRAG evaluation metrics to weight chunk quality. Frameworks like RAGAS enable such evaluation\nwithout ground-truth answers by checking context relevance and answer faithfulness. One could\nimagine integrating that: if a chunk has low \u201ccontext relevance\u201d scores across many test queries,\nmaybe its content is too broad or noisy.\nComparison Summary: In practice, pattern-based methods are good for precision (ensuring basic\nstandards), LLM-based methods are good for recall of quality (catching subtle good/bad content the\npatterns miss), and embedding or other metrics provide additional signals (duplicate detection, topic\ncoherence) that neither rules nor LLMs easily give. A hybrid system can yield high precision and high recall",
+    "metadata": {
+      "chunk_tokens": 258,
+      "chunk_total": 4,
+      "quality_score": 7.45,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\noutperformed naive fixed-size splitting in both accuracy and efficiency. In essence, when\nchunks are higher quality (more self-contained and topically focused), the vector search finds the\nright information more often.\nQuality thresholds and recall: Our own scenario with The Architect\u2019s Guide is telling. By imposing an\noverly high quality cutoff (9.5/10), we excluded all chunks from that document, thus recall dropped\nto zero for any queries that that guide could have answered. This illustrates a general point: an\naggressive filter can harm retrieval performance if it filters out useful content. It\u2019s similar to Azure\u2019s\nobservation \u2013 if the strictness parameter is too high, even relevant chunks get filtered out, hurting the\nfinal answer. On the other hand, a very low threshold (letting everything in) can hurt precision \u2013\nthe index might retrieve some junk chunks that confuse the LLM or lead to incorrect answers.\nCorrelation with answer accuracy: For RAG pipelines, the ultimate metric is whether the LLM\u2019s\nanswers are accurate and helpful, which depends on retrieving the right context. High-quality\nchunks (relevant, correct, complete) should logically yield better answers. Frameworks like RAGAS",
+    "metadata": {
+      "chunk_tokens": 262,
+      "chunk_total": 4,
+      "quality_score": 7.52,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nContext relevance vs answer correctness: RAGAS metrics show that Context Precision (how much of\nretrieved text was actually needed) and Context Recall (did we retrieve all that was needed) are\ndirectly tied to answer success. High context precision means the model isn\u2019t distracted by\nirrelevancies, and high context recall means it got all necessary pieces. Quality control can improve\nboth: by removing junk, you raise precision; by ensuring important info isn\u2019t missing (completeness),\nyou raise recall. There might be a trade-off \u2013 if you remove too aggressively, recall suffers; if you\ninclude too liberally, precision suffers. The optimal quality strategy finds the sweet spot where the\nmodel gets everything it needs and little that it doesn\u2019t.\nUser satisfaction: Beyond technical metrics, the real proof of quality is user satisfaction. If the\nanswers provided by the system are accurate, clear , and timely, users will be happy \u2013 and that implies\nthe underlying knowledge base served its role well. Some teams use A/B tests: e.g., compare a\nversion of the KB with strict quality filtering to a version with looser filtering, and see which yields",
+    "metadata": {
+      "chunk_tokens": 254,
+      "chunk_total": 4,
+      "quality_score": 7.25,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nto arbitrary rules.\nAdjustable Thresholds: Different projects may set different quality bars. We should allow the 0\u201310\ncutoff to be configurable. For internal knowledge bases, maybe we only want to drop truly awful\ncontent (threshold 3/10) because any info might be useful. For a user-facing Q&A bot in a sensitive\ndomain, we might set a high bar (say 8/10) to only include polished, vetted text. The Azure strictness\nparameter is a good analogy \u2013 it lets developers tune how aggressive the filter is on retrieved results\n. We should similarly let llmfy users adjust the quality threshold per use-case. Also, as\ndiscussed, one might tune it based on retrieval testing (if answers are suffering, maybe lower the\nthreshold to include more context).\nDomain-Specific Models & Criteria: Our system should detect the domain or let the user specify it\n(tech, legal, medical, etc.), and then apply domain-aware scoring. For example, in legal domain: look\nfor citations of laws/cases \u2013 a chunk explaining a legal concept is higher quality if it references",
+    "metadata": {
+      "chunk_tokens": 247,
+      "chunk_total": 4,
+      "quality_score": 7.91,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nscoring (maybe don\u2019t require prose-style features for those). Similarly for images: If an image has a\ncaption or alt text, include that as a chunk with appropriate metadata (e.g., \u201cFigure: screenshot of\narchitecture diagram\u2026\u201d). Even though the LLM can\u2019t see the image, the caption is useful. Quality-\nwise, we\u2019d ensure the caption text is descriptive and not just \u201cimage1.png\u201d. We likely won\u2019t \u201cscore\u201d\nimages themselves (that\u2019s a whole other modality), but we should at least not drop image captions\nor related text which could help answer questions about the image content.\nReal-time vs Batch: If llmfy processes documents in real-time, we need to keep latency low (hence\nthe importance of mostly using fast rules). If it\u2019s batch (e.g., building a KB overnight), we can afford a\nbit more heavy lifting. We might implement an async pipeline \u2013 ingest quickly with patterns, allow\nquerying immediately, but then backfill improved scores later with LLM evaluation for better filtering\nas a second phase. This way users get fast ingestion and improved quality over time.",
+    "metadata": {
+      "chunk_tokens": 248,
+      "chunk_total": 4,
+      "quality_score": 7.41,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\napproach: generate synthetic queries for each chunk (or each document) to see if the chunk is\nretrievable and helpful, then train a model to predict quality from that. This is complex, but it\neffectively ties chunk quality to actual usage in QA scenarios. The downside is the effort and\ncomplexity of generating and maintaining such a system. Still, as RAG matures, having automated\nevaluators (RAGAS, ARES, etc.) will likely become standard.\nSelf-RAG (Self-Reflective RAG): This is a methodology where the LLM not only retrieves and\ngenerates answers, but also critiques its own answer and can trigger additional retrieval if needed\n. While not a \u201cquality scoring\u201d tool per se, Self-RAG introduces the idea of the model\nevaluating content on the fly. For example, after generating an answer using some retrieved chunks,\nthe LLM checks: \u201cDid I have enough info? Is the answer factual?\u201d If not, it can retrieve more or adjust.\nHow does this relate to KB quality? In a way, Self-RAG will implicitly favor better chunks: if a chunk is",
+    "metadata": {
+      "chunk_tokens": 251,
+      "chunk_total": 5,
+      "quality_score": 7.25,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nAnthropic, etc., likely apply moderation filters on ingested data if it\u2019s user-provided. It\u2019s worth\nmentioning that a chunk could be perfectly relevant but contain hate speech or privacy-sensitive\ninfo, which we\u2019d want to exclude for ethical/legal reasons. So a complete quality control system\nincludes these checks as well (perhaps as a separate module parallel to quality scoring).\nTo summarize, there\u2019s a growing ecosystem of tools to evaluate RAG systems. They largely focus on\nretrieval and generation correctness (which is the end goal of having a quality KB). We should leverage\nthese where possible to validate our quality control: for example, after implementing changes, use RAGAS\nor a set of queries to measure if retrieval precision/recall improved. These frameworks reinforce the idea\nthat \u201cquality\u201d is not an abstract score \u2013 it\u2019s tied to actual LLM usage of the data.\n[LIST_ITEM]7. Practical Recommendations for llmfy\u2019s Quality Pipeline\nFinally, based on all the above, here are concrete recommendations to upgrade llmfy\u2019s quality control:\n(a) Redefine the Scoring Criteria: Move away from narrow pattern-checks and incorporate the quality",
+    "metadata": {
+      "chunk_tokens": 256,
+      "chunk_total": 4,
+      "quality_score": 7.61,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n(c) Domain Awareness: Incorporate a step where the user or the document metadata can specify the\ndomain, which toggles domain-specific rules. For instance, if a document is a \u201cdesign guide\u201d (like The\nArchitect\u2019s Guide), structure might be less formal \u2013 so maybe lower the weight on having headings, and\nincrease weight on descriptive language. If it\u2019s \u201clegal\u201d, do the opposite, etc. We could maintain a small\nconfig for each domain with what to prioritize. Over time, as we gather more data, we might even train\nseparate quality classifiers per domain.\n(d) Regular Evaluation and Feedback: Use RAGAS or a set of test queries to periodically evaluate the\nretrieval performance of the knowledge base. If adding the quality filter is not improving precision/\nrecall in retrieval results, revisit the criteria. For example, if our filter removed 5% of chunks and that caused\nanswer accuracy to drop, we removed something valuable \u2013 find out why and adjust. Perhaps those chunks\nwere missing a heading but were very relevant; we\u2019d then adjust the scoring to not remove such cases.",
+    "metadata": {
+      "chunk_tokens": 243,
+      "chunk_total": 5,
+      "quality_score": 7.56,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nscore the caption text. For tables, ensure they aren\u2019t split into nonsense. Possibly convert small tables to\nmarkdown tables in the chunk text for better preservation (and the LLM can read it at query time). Mark\ndown in metadata that a chunk is a table so we know traditional prose-based scoring might not fully apply \u2013\nyet table chunks are often very useful (they might answer questions like \u201cWhat\u2019s the opacity value for\nsecondary buttons?\u201d directly). So our pipeline should include them by default, maybe with a neutral score\nunless content clearly indicates otherwise.\n(j) End-User Satisfaction Metrics: Ultimately, incorporate user feedback. If the application built on llmfy\nallows users to rate answers or provide feedback, use that to infer if certain source content was helpful or\nnot. For example, if answers based on a particular document get bad feedback, maybe that document\u2019s\nchunks aren\u2019t good (or the doc is off-topic). That might trigger a review of those chunks\u2019 quality. Conversely,\nhighly praised answers can highlight which chunks were particularly useful \u2013 perhaps we should ensure\nsimilar content is not filtered in future.",
+    "metadata": {
+      "chunk_tokens": 244,
+      "chunk_total": 5,
+      "quality_score": 7.550000000000001,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 2,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n[2309.15217] Ragas: Automated Evaluation of Retrieval Augmented Generation\nhttps://arxiv.org/abs/2309.15217\nSelf-Reflective Retrieval-Augmented Generation (SELF-RAG)\nhttps://cobusgreyling.medium.com/self-reflective-retrieval-augmented-generation-self-rag-f5cbad4412d5\nSELF-RAG (Self-Reflective Retrieval-Augmented Generation)\nhttps://medium.com/@sahin.samia/self-rag-self-reflective-retrieval-augmented-generation-the-game-changer-in-factual-ai-\ndd32e59e3ff9\nHow Do You Test a RAG System? TLDR; - LinkedIn\nhttps://www.linkedin.com/pulse/how-do-you-test-rag-system-tldr-varghese-chacko-hkiec\nDefine Custom LangChain Evaluation Metrics - ApX Machine Learning\nhttps://apxml.com/courses/langchain-production-llm/chapter-5-evaluation-monitoring-observability/custom-evaluation-metrics\n1 5 6 18\n2 3 4 13",
+    "metadata": {
+      "chunk_tokens": 249,
+      "chunk_total": 4,
+      "quality_score": 8.025,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\ntables intact by adjusting chunk size) to avoid losing critical info.\n\u2022 \n1\n2\n3 4\n\u2022 \n5\n6\n\u2022 \n7 8\n9 10\n11\n\u2022 12\n13\n1",
+    "metadata": {
+      "chunk_tokens": 63,
+      "chunk_total": 4,
+      "quality_score": 7.75,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nmight bring lots of irrelevant text. Many frameworks recommend a few hundred tokens per chunk as\na rule of thumb, then refine from there.\nSemantic Density: This refers to the amount of actual information per token. High-quality chunks\nfor LLM use tend to be dense in knowledge (facts, names, figures) and low in fluff. If a chunk has many\nstop-words or generic filler text, its embedding may not strongly represent the key content. Our\ncurrent scorer tried to measure this indirectly (rewarding presence of numbers, lists, code, etc.). A\nbetter approach might explicitly reward chunks that have a high ratio of informative content (dates,\nentities, terminology) \u2013 these often correlate with useful facts for answering queries. However ,\ndensity should not come at the cost of readability. There\u2019s a balance between dense and gibberish.\n\u2022 \n14\n15 16\n\u2022 \n17\n\u2022 \n5\n18\n\u2022 \n19\n1\n\u2022 \n2",
+    "metadata": {
+      "chunk_tokens": 214,
+      "chunk_total": 4,
+      "quality_score": 7.69,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nit\u2019s a Python tool \u2013 so if the query is \u201cHow to use X in Python,\u201d the chunk is retrievable. These little\nconnections improve recall.\nUniqueness (Non-Redundancy): Each chunk should add unique information. If multiple chunks are\nnearly identical or one is a subset of another , they clog the index and may confuse the retriever .\nDeduplication is thus a part of quality control. Some systems measure embedding similarity between\nchunks to find near-duplicates and then merge or remove them. Ensuring each chunk is distinct also\nimproves the diversity of retrieval results. (However , slight overlap can be fine if it\u2019s unavoidable, or\nfor important facts that appear in multiple docs. The key is to avoid large swaths of duplicate text.)\nDomain-Specific Criteria: Certain domains impose extra quality dimensions. For instance, in legal\ndocuments, precise quoting of statutes or case law is crucial \u2013 a chunk without the exact text of the\n\u2022 \n\u2022 \n\u2022 \n\u2022 \n\u2022 \n\u2022 \n3",
+    "metadata": {
+      "chunk_tokens": 229,
+      "chunk_total": 4,
+      "quality_score": 7.46,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases | Section: Definition: WidgetCorp is a software company. For example, WidgetCorp makes widgets.]\n\n## Definition: WidgetCorp is a software company. For example, WidgetCorp makes widgets.\nThis relates to widget-making.\nThis toy chunk might hit all our pattern keywords and get 10/10, yet it conveys almost no real knowledge.\nPattern-based systems cannot truly understand the content; they only search for surface signals. They often\nmiss semantic quality issues (like accuracy or coherence) and overvalue superficial structure. As content\nevolves (new formats, different writing styles), a static rule set becomes brittle. In practice, we saw our\nscorer \u201cpenalize\u201d natural writing and \u201creward\u201d mechanical, template-like text \u2013 clearly not the intent.\nWhen it works: If your documents follow a very uniform template (e.g., a Q&A knowledge base where\nevery answer should have an \u201cExample:\u201d section), pattern rules can enforce consistency. It\u2019s also useful as a\n4",
+    "metadata": {
+      "chunk_tokens": 217,
+      "chunk_total": 4,
+      "quality_score": 7.630000000000001,
+      "section": "Definition: WidgetCorp is a software company. For example, WidgetCorp makes widgets."
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\ntransparency. If an LLM gives a chunk an 8/10 score, it\u2019s hard to precisely know why. You can ask it for\nreasoning, but that\u2019s another layer of complexity.\nReliability: LLM evaluation is generally good at obvious cases (it will easily flag a gibberish chunk or a\ntotally irrelevant chunk as low quality, and praise a well-written explanatory chunk as high quality). But it\ncan be inconsistent on borderline cases. The same chunk might get slightly different scores on different\ndays or models. Prompt design is critical \u2013 e.g., instructing GPT-4 to focus on factual accuracy vs\ncompleteness can lead to different scoring emphasis. And LLMs might have biases (they might favor more\nverbose text as \u201cmore complete\u201d even if it\u2019s just wordier).\nWhen it works: When you need a holistic quality judgment and can afford to spend compute on it. It\u2019s\nexcellent for validating chunks that pass basic checks \u2013 for example, after a pattern filter , you send the\n\u201cmaybe good\u201d chunks to GPT-4 to confirm they are indeed good. LLM eval is also useful for specific",
+    "metadata": {
+      "chunk_tokens": 255,
+      "chunk_total": 5,
+      "quality_score": 7.54,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\ncontains crucial but rare info, not because it\u2019s bad. Or a chunk could be internally cohesive but still useless\n(10 sentences all about nothing important). So you can\u2019t rely solely on an embedding metric to accept/reject\ncontent \u2013 you\u2019d use it as a signal among others. Also, computing pairwise similarities at scale can be heavy\n(though approximate methods exist). Embeddings also won\u2019t directly tell you about factual accuracy or\nreadability.\nWhen it works: As part of a hybrid system to flag potential issues. For example, after ingesting, you might\nrun a quick clustering and find that 5 chunks all have extremely similar vectors \u2013 likely duplicates, so maybe\nonly keep the best one. Or use sentence similarity to decide if a chunk should be split (if two halves of a\nchunk have very low similarity, that chunk might be two unrelated things jammed together \u2013 a candidate\nfor re-chunking).\n23 24\n25\n26\n27\n6",
+    "metadata": {
+      "chunk_tokens": 215,
+      "chunk_total": 4,
+      "quality_score": 8.030000000000001,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\npatterns miss), and embedding or other metrics provide additional signals (duplicate detection, topic\ncoherence) that neither rules nor LLMs easily give. A hybrid system can yield high precision and high recall\nin quality assessment, by not relying on any single method.\n(See comparison in the table below:)\nMethod Pros Cons Use Cases\nPattern-\nBased\nFast, zero cost,\ninterpretable; enforces\nformat or presence of key\nelements .\nRigid and surface-level;\nmisses semantic quality;\ncan reject good prose or\naccept fluff.\nInitial filter; enforce\nminimal structure or\nlength.\n\u2022 \n21\n9\n7",
+    "metadata": {
+      "chunk_tokens": 144,
+      "chunk_total": 4,
+      "quality_score": 7.430000000000001,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nanswers are accurate and helpful, which depends on retrieving the right context. High-quality\nchunks (relevant, correct, complete) should logically yield better answers. Frameworks like RAGAS\nexplicitly measure Answer Relevancy and Faithfulness \u2013 essentially checking if the LLM\u2019s answer is\n21 22\n\u2022 \n19\n28 29\n\u2022 \n4\n\u2022 \n8",
+    "metadata": {
+      "chunk_tokens": 93,
+      "chunk_total": 4,
+      "quality_score": 7.57,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nthe underlying knowledge base served its role well. Some teams use A/B tests: e.g., compare a\nversion of the KB with strict quality filtering to a version with looser filtering, and see which yields\nhigher answer helpfulness ratings from users. Often, a moderate approach wins \u2013 ensure obviously\nbad data is gone (so users don\u2019t get wild hallucinations from it), but keep the rich informative text\neven if it\u2019s not perfectly formatted.\nKey insight: A high \u201cquality score\u201d only correlates with better retrieval if that score truly measures things\nthat impact retrieval (like relevance, completeness, correctness). Our old scorer\u2019s 9.5/10 did not correlate\nwith retrieval success \u2013 it was excluding good info. Going forward, we should ground our quality metrics in\nretrieval outcomes. One way is the proxy model approach: take a bunch of Q&A pairs, see which chunks\nlead to correct answers, and adjust the scoring to favor those chunk characteristics. In other words,\n\u201cquality\u201d should be defined by what helps the LLM answer questions accurately, not abstract ideals.\n21\n30\n30\n\u2022 \n\u2022 \n21\n\u2022 \n9",
+    "metadata": {
+      "chunk_tokens": 253,
+      "chunk_total": 4,
+      "quality_score": 7.82,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\n(tech, legal, medical, etc.), and then apply domain-aware scoring. For example, in legal domain: look\nfor citations of laws/cases \u2013 a chunk explaining a legal concept is higher quality if it references\nstatute numbers or precedent (indicating authority). In medical: presence of terminology and\nperhaps a cautious tone or references to studies could be a positive signal, whereas speculation or\noutdated info is negative. In code documentation: having code examples and outputs is high quality;\na chunk that is just prose with no code might be less useful in an API reference context. These\n\u2022 \n\u2022 \n\u2022 \n22\n\u2022 \n\u2022 \n3 4\n\u2022 \n10",
+    "metadata": {
+      "chunk_tokens": 155,
+      "chunk_total": 4,
+      "quality_score": 7.79,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nquerying immediately, but then backfill improved scores later with LLM evaluation for better filtering\nas a second phase. This way users get fast ingestion and improved quality over time.\nLogging and Explainability: For each chunk, it\u2019s good to log what decisions were made (especially if\nit was rejected). E.g., \u201cChunk X was rejected: pattern score 4/10 (lacked headings, short length) and\nLLM also flagged it as incomplete definition.\u201d This will help us and users trust the system and debug\nissues. It\u2019s also useful for continuously improving the scorer \u2013 those logs become training data or\nrules refinements.\nIn short, implementation is about scalability and flexibility \u2013 use a multi-tier approach to keep costs down,\nallow tuning for different needs, and handle the quirks of different content types (from text walls to tables\nto code to images).\n14\n\u2022 \n31\n\u2022 \n13\n\u2022 \n\u2022 \n11",
+    "metadata": {
+      "chunk_tokens": 208,
+      "chunk_total": 4,
+      "quality_score": 7.71,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nHow does this relate to KB quality? In a way, Self-RAG will implicitly favor better chunks: if a chunk is\nirrelevant or misleading, the self-reflection step would catch the inconsistency, and possibly that\nchunk won\u2019t be used next time. It\u2019s a runtime approach rather than pre-index, but it\u2019s good to know\nthese techniques exist. They reduce reliance on perfect ingestion quality by adding a safety net at\ngeneration time. However , they increase inference costs and complexity.\nLangChain\u2019s Evaluation Module: LangChain provides tools to evaluate QA performance, such as\nQAEvalChain which uses an LLM to compare an LLM\u2019s answer against a reference answer . They\nalso allow evaluating retrieval: e.g., given a query and the retrieved documents, use an LLM to score\nrelevance . One can define custom evaluators \u2013 e.g., a Context Relevance evaluator that checks if\nthe retrieved chunk truly answers the query. For our purposes, LangChain\u2019s eval tools could be\nharnessed in a feedback loop to judge our knowledge base. For instance, we could generate some\nquestions for each document (using the document content itself, or manually), then have an LLM",
+    "metadata": {
+      "chunk_tokens": 261,
+      "chunk_total": 5,
+      "quality_score": 7.25,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nFinally, based on all the above, here are concrete recommendations to upgrade llmfy\u2019s quality control:\n(a) Redefine the Scoring Criteria: Move away from narrow pattern-checks and incorporate the quality\ndimensions that truly matter . For instance: - Context completeness: Ensure each chunk has proper nouns\nor context to be standalone (if not, maybe merge it with an adjacent chunk or prepend context like\nAnthropic does). - Factuality signals: If the content is supposed to have citations (academic text, etc.),\ncheck for the presence of references. If the domain is technical, maybe verify if code compiles or at least is\npresent when expected. - Semantic richness: Reward chunks that have specific entities, dates, numbers (a\nproxy for containing concrete info). - Readability: The text shouldn\u2019t be overly complex or unstructured.\n\u2022 \n41 42\n30\n\u2022 \n\u2022 \n18\n11\n13",
+    "metadata": {
+      "chunk_tokens": 205,
+      "chunk_total": 4,
+      "quality_score": 7.61,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nanswer accuracy to drop, we removed something valuable \u2013 find out why and adjust. Perhaps those chunks\nwere missing a heading but were very relevant; we\u2019d then adjust the scoring to not remove such cases.\n(e) Example \u2013 Revisiting The Architect\u2019s Guide: Let\u2019s apply these improvements to the example. Our new\nsystem would recognize that those chunks, while narrative, are semantically dense (they mention specific\ncolor codes, UI component names, external guidelines) \u2013 all signs of a high-quality technical explanation.\nThe pattern score might give it, say, 6/10 (no headers, but it\u2019s long and has numbers). The LLM eval would\nlikely score it high (maybe 9/10, noting it\u2019s clearly written and informative). The combined score would pass\nthe threshold. Thus, those chunks would be included in the KB. Meanwhile, if there was a truly low-value\nchunk (say an introductory blurb with no concrete info), both the pattern and LLM would rate it low and it\ngets filtered. This way we retain genuinely useful content regardless of format.",
+    "metadata": {
+      "chunk_tokens": 238,
+      "chunk_total": 5,
+      "quality_score": 7.54,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nhighly praised answers can highlight which chunks were particularly useful \u2013 perhaps we should ensure\nsimilar content is not filtered in future.\nBy implementing these recommendations, llmfy can evolve from a rigid rule-based gatekeeper to a smart\nquality assessor that recognizes genuinely valuable knowledge in whatever form it comes. The ideal\noutcome is a knowledge base where each chunk included has a purpose: either it directly answers\nquestions, or it provides necessary context \u2013 and nothing included will mislead or confuse the LLM. That\ntranslates to users getting accurate, context-rich answers with confidence in the underlying data quality.\nConclusion: Quality control for LLM knowledge bases is a multi-faceted challenge. The state-of-the-art is\nmoving towards evaluation grounded in retrieval success. By broadening our notion of quality (beyond simple\npatterns), leveraging LLM judgment wisely, and focusing on what helps the LLM do its job, we can ensure\nour knowledge bases are not just high-scoring in theory, but high-performing in practice. The result will be\na more reliable RAG system, able to tap into the full value of excellent sources like The Architect\u2019s Guide\nwithout being tripped up by superficial criteria.",
+    "metadata": {
+      "chunk_tokens": 260,
+      "chunk_total": 5,
+      "quality_score": 7.05,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 3,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nhttps://apxml.com/courses/langchain-production-llm/chapter-5-evaluation-monitoring-observability/custom-evaluation-metrics\n1 5 6 18\n2 3 4 13\n7 8 9 10 11 14 17\n12\n15 16\n19 25 26 27 28 29\n20 33\n21 22 31 34 35 36\n23\n24\n30 41 42\n32\n37\n38\n39\n40\n16",
+    "metadata": {
+      "chunk_tokens": 130,
+      "chunk_total": 4,
+      "quality_score": 7.975,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 4,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nexcellent for validating chunks that pass basic checks \u2013 for example, after a pattern filter , you send the\n\u201cmaybe good\u201d chunks to GPT-4 to confirm they are indeed good. LLM eval is also useful for specific\ndimensions like factuality: you can prompt an LLM with the chunk and ask \u201cis this chunk factually accurate\nand derived from a credible source?\u201d \u2013 something rules cannot do.\n20\n21\n22\n5",
+    "metadata": {
+      "chunk_tokens": 107,
+      "chunk_total": 5,
+      "quality_score": 7.55,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 4,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nharnessed in a feedback loop to judge our knowledge base. For instance, we could generate some\nquestions for each document (using the document content itself, or manually), then have an LLM\n\u2022 \n32\n21\n33\n\u2022 \n34 31\n35\n36\n\u2022 \n37 38\n\u2022 \n39\n40\n12",
+    "metadata": {
+      "chunk_tokens": 87,
+      "chunk_total": 5,
+      "quality_score": 7.75,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 4,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\nchunk (say an introductory blurb with no concrete info), both the pattern and LLM would rate it low and it\ngets filtered. This way we retain genuinely useful content regardless of format.\n(f) Focus on Retrieval Utility: We should measure success not by how many chunks score 10, but by how\nwell the system answers user questions. A practical metric: Take a set of questions and see if the answers\ncontain correct info with citations. If not, identify if it\u2019s because the needed chunk was filtered out or\nbecause the chunk didn\u2019t exist. This ties into possibly generating synthetic queries to probe the KB\ncoverage. For instance, if we have a doc about CSS Grid vs Flexbox, a synthetic query could be \u201cWhen should I\n22\n15\n14",
+    "metadata": {
+      "chunk_tokens": 174,
+      "chunk_total": 5,
+      "quality_score": 7.69,
+      "section": "Unknown"
+    }
+  },
+  {
+    "chunk_index": 4,
+    "content": "[Context: Document: Quality Control Methods For Llm Knowledge Bases]\n\na more reliable RAG system, able to tap into the full value of excellent sources like The Architect\u2019s Guide\nwithout being tripped up by superficial criteria. \n15",
+    "metadata": {
+      "chunk_tokens": 49,
+      "chunk_total": 5,
+      "quality_score": 7.21,
+      "section": "Unknown"
+    }
+  }
+]
