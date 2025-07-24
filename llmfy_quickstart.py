@@ -199,7 +199,7 @@ enhancements:
         config_dir.mkdir(exist_ok=True)
         
         # Write configs
-        (config_dir / "nexus_config.yaml").write_text(main_config)
+        (config_dir / "llmfy_config.yaml").write_text(main_config)
         (config_dir / "quality_rules.yaml").write_text(quality_rules)
         
         console.print("[green]✅ Configuration files created[/green]")

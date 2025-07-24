@@ -69,7 +69,7 @@ When you process the test document:
 - **Auto Enhancement**: Enabled
 
 ### To Switch to Production
-Edit `config/nexus_config.yaml`:
+Edit `config/llmfy_config.yaml`:
 ```yaml
 environment: production  # Changed from development
 ```
@@ -92,7 +92,7 @@ nexus_ai_library/
 │   ├── embeddings/            # Hybrid embedder
 │   └── (storage, retrieval, mcp...)
 ├── ⚙️  Configuration
-│   └── config/nexus_config.yaml
+│   └── config/llmfy_config.yaml
 ├── 📂 Data
 │   ├── inbox/                 # New documents go here
 │   ├── processed/             # Quality-approved content
