@@ -4,17 +4,13 @@
 """
 
 import os
-import sys
 from pathlib import Path
 from typing import List, Dict, Any, Union, Tuple
 import hashlib
 import json
 from datetime import datetime
 
-# Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-from src.core.embedding_generator import EmbeddingGenerator
+from ..core.embedding_generator import EmbeddingGenerator
 
 try:
     from sentence_transformers import SentenceTransformer

@@ -244,7 +244,6 @@ MAX_MONTHLY_COST=100
         # Test imports
         test_script = """
 import sys
-sys.path.insert(0, '.')
 
 try:
     from src.core.config import Config

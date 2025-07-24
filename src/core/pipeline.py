@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 import argparse
@@ -10,9 +9,6 @@ import json
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent))
 
 from .config import Config
 from .document_loader import DocumentLoader

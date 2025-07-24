@@ -5,11 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "llmfy"
 version = "0.1.0"
-description = "Quality-first document processing pipeline"
+
+description = "Quality-first document processing toolkit"
 readme = "README.md"
 requires-python = ">=3.8"
-authors = [{name="llmfy"}]
+
+[project.scripts]
+llmfy = "llmfy:main"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+include = ["src*"]
 
