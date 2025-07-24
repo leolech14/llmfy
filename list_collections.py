@@ -10,3 +10,4 @@ print("Available collections:")
 for col in collections:
     print(f"  - {col.name}")
     print(f"    Count: {col.count()}")
+
