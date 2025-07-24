@@ -13,6 +13,7 @@ import json
 from .pipeline import KnowledgeBasePipeline
 from .document_loader import DocumentLoader
 from .text_processor_v2 import TextProcessorV2SlidingWindow, ChunkingConfig
+from ..processing.semantic_linker import SemanticLinker
 from ..quality.quality_scorer_v2 import ImprovedQualityAnalyzer as QualityAnalyzer
 from ..quality.quality_enhancer import QualityEnhancer
 from ..embeddings.hybrid_embedder import HybridEmbedder
@@ -45,7 +46,7 @@ class LlmfyPipeline(KnowledgeBasePipeline):
         self.processor = TextProcessorV2SlidingWindow(
             config=ChunkingConfig(
                 chunk_size=250,
-                chunk_overlap=100,  # Increased from 50 for better continuity
+                chunk_overlap=25,  # Reduced from 100 - we'll use semantic links instead
                 min_chunk_size=100
             ),
             use_semantic_chunking=True
@@ -240,6 +241,16 @@ class LlmfyPipeline(KnowledgeBasePipeline):
         stored_count = self.vector_store.add_documents(doc_embeddings)
         
         console.print(f"\n[green]✅ Successfully processed {stored_count} high-quality chunks![/green]")
+        
+        # Run semantic linking post-processing
+        if stored_count > 0:
+            console.print("\n[cyan]🔗 Running semantic link analysis...[/cyan]")
+            try:
+                linker = SemanticLinker()
+                link_report = linker.analyze_chunks()
+                console.print(f"[green]✅ Created {link_report.get('total_links', 0)} semantic links[/green]")
+            except Exception as e:
+                console.print(f"[yellow]⚠ Semantic linking skipped: {e}[/yellow]")
         
         # Offer to run blind test
         if stored_count > 0:
