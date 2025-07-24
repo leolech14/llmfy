@@ -8,9 +8,6 @@ Transform raw documents into high-quality, LLM-ready knowledge chunks.
 import sys
 from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent))
-
 # Import the main llmfy command
 from llmfy import main
 

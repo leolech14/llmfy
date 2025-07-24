@@ -5,7 +5,6 @@ Test the new quality scorer with real examples
 
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent))
 
 from src.quality.quality_scorer import KnowledgeQualityAnalyzer as OldAnalyzer
 from src.quality.quality_scorer_v2 import ImprovedQualityAnalyzer as NewAnalyzer
