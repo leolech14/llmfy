@@ -22,3 +22,4 @@ def test_smart_chunk_document_returns_expected_chunks(sample_document):
     assert [c.metadata["chunk_index"] for c in chunks] == [0, 1, 2]
     assert all(c.metadata["chunk_total"] == 3 for c in chunks)
     assert all(c.page_content.startswith("[Context: Document: Sample") for c in chunks)
+
