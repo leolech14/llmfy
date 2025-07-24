@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
-Simple test to verify Nexus setup
+Simple test to verify llmfy setup
 """
 
 import os
 import sys
 from pathlib import Path
 
-print("🧠 Nexus AI Library - Setup Test\n")
+print("🧠 llmfy AI Library - Setup Test\n")
 
 # Check Python version
 print(f"✅ Python version: {sys.version}")
 
 # Check directory structure
-nexus_dir = Path(__file__).parent
+llmfy_dir = Path(__file__).parent
 required_dirs = ['src', 'config', 'data', 'data/inbox', 'data/processed']
 
 print("\n📁 Directory structure:")
 for dir_name in required_dirs:
-    dir_path = nexus_dir / dir_name
+    dir_path = llmfy_dir / dir_name
     if dir_path.exists():
         print(f"  ✅ {dir_name}/")
     else:
@@ -27,9 +27,9 @@ for dir_name in required_dirs:
 # Check key files
 print("\n📄 Key files:")
 key_files = [
-    'nexus_quickstart.py',
-    'nexus_validator.py',
-    'src/core/nexus_pipeline.py',
+    'llmfy_quickstart.py',
+    'llmfy_validator.py',
+    'src/core/llmfy_pipeline.py',
     'src/quality/quality_scorer.py',
     'src/quality/quality_enhancer.py',
     'src/embeddings/hybrid_embedder.py',
@@ -38,7 +38,7 @@ key_files = [
 ]
 
 for file_name in key_files:
-    file_path = nexus_dir / file_name
+    file_path = llmfy_dir / file_name
     if file_path.exists():
         print(f"  ✅ {file_name}")
     else:
@@ -46,9 +46,9 @@ for file_name in key_files:
 
 # Check API keys
 print("\n🔑 API Keys:")
-if (nexus_dir / '.env').exists():
+if (llmfy_dir / '.env').exists():
     # Load .env file
-    with open(nexus_dir / '.env', 'r') as f:
+    with open(llmfy_dir / '.env', 'r') as f:
         env_content = f.read()
     
     if 'OPENAI_API_KEY=' in env_content and 'sk-' in env_content:
@@ -64,7 +64,7 @@ else:
     print("  ❌ .env file missing")
 
 # Check test document
-test_doc = nexus_dir / 'data/inbox/test_document.md'
+test_doc = llmfy_dir / 'data/inbox/test_document.md'
 if test_doc.exists():
     print("\n📝 Test document:")
     print(f"  ✅ {test_doc.name} ({test_doc.stat().st_size} bytes)")
@@ -76,5 +76,5 @@ print("\n🚀 Next steps:")
 print("1. Create virtual environment: python3 -m venv venv")
 print("2. Activate it: source venv/bin/activate")
 print("3. Install dependencies: pip install langchain chromadb sentence-transformers openai pinecone-client python-dotenv rich pyyaml")
-print("4. Run quickstart: python nexus_quickstart.py")
-print("\nOr simply run: python3 nexus_quickstart.py (it will do everything for you!)")
+print("4. Run quickstart: python llmfy_quickstart.py")
+print("\nOr simply run: python3 llmfy_quickstart.py (it will do everything for you!)")

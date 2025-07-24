@@ -134,3 +134,8 @@ Built using insights from:
 ---
 
 Made with ❤️ for the RAG community
+
+
+## Disclaimer
+This project uses AI-generated content and the outputs may be inaccurate or incomplete. Use at your own risk.
+

@@ -9,7 +9,19 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Any
 
 class KnowledgeQualityAnalyzer:
-    def __init__(self, librarian_root="/Users/lech/02_knowledge/librarian"):
+    def __init__(self, librarian_root: str | None = None):
+        """Initialize the analyzer.
+
+        Parameters
+        ----------
+        librarian_root : str | None, optional
+            Base directory for processed documents. Defaults to ``./data/librarian``
+            relative to the current working directory.
+        """
+
+        if librarian_root is None:
+            librarian_root = Path.cwd() / "data" / "librarian"
+
         self.root = Path(librarian_root)
         self.vector_dir = self.root / "vectors"
         

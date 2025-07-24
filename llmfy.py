@@ -39,7 +39,7 @@ Examples:
     subparsers = parser.add_subparsers(dest='command', help='Commands')
     
     # Ingest command
-    ingest_parser = subparsers.add_parser('ingest', help='Add document to Nexus')
+    ingest_parser = subparsers.add_parser('ingest', help='Add document to llmfy')
     ingest_parser.add_argument('document', help='Path to document')
     ingest_parser.add_argument('--process', '-p', action='store_true',
                               help='Process immediately after ingesting')

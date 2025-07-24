@@ -95,3 +95,4 @@ print("\n🎯 KEY INSIGHTS:")
 print("• The new scorer recognizes valuable content regardless of format")
 print("• Focuses on retrieval-relevant qualities like specificity and context")
 print("• Better aligned with what makes chunks useful for RAG systems")
+

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🚀 Nexus AI Library - Quick Start Script
+🚀 llmfy AI Library - Quick Start Script
 
 One command to set up your quality-first AI knowledge system.
 """
@@ -17,7 +17,7 @@ import time
 
 console = Console()
 
-class NexusQuickStart:
+class llmfyQuickStart:
     def __init__(self):
         self.nexus_root = Path(__file__).parent
         self.venv_path = self.nexus_root / "venv"
@@ -38,7 +38,7 @@ class NexusQuickStart:
     def welcome(self):
         """Display welcome message"""
         console.print(Panel.fit(
-            "[bold cyan]🧠 Welcome to Nexus AI Library System[/bold cyan]\n\n"
+            "[bold cyan]🧠 Welcome to llmfy AI Library System[/bold cyan]\n\n"
             "[white]The quality-first knowledge management system[/white]\n"
             "[dim]Every chunk must score 9.5/10 or higher[/dim]",
             border_style="cyan"
@@ -124,7 +124,7 @@ class NexusQuickStart:
         console.print("\n[bold]⚙️  Creating configuration files...[/bold]")
         
         # Main config
-        main_config = """# Nexus AI Library Configuration
+        main_config = """# llmfy AI Library Configuration
 
 environment: development
 
@@ -206,7 +206,7 @@ enhancements:
         
     def create_env_file(self):
         """Create .env template"""
-        env_template = """# Nexus AI Library Environment Variables
+        env_template = """# llmfy AI Library Environment Variables
 
 # OpenAI API (for production embeddings)
 OPENAI_API_KEY=your_api_key_here
@@ -298,7 +298,7 @@ except Exception as e:
         console.print("\n" + "="*60 + "\n")
         
         console.print(Panel(
-            "[bold green]🎉 Nexus AI Library is ready![/bold green]\n\n"
+            "[bold green]🎉 llmfy AI Library is ready![/bold green]\n\n"
             "[bold]Next steps:[/bold]\n\n"
             "1. Activate the virtual environment:\n"
             f"   [cyan]source {self.venv_path}/bin/activate[/cyan] (Unix)\n"
@@ -333,5 +333,5 @@ except Exception as e:
             return
 
 if __name__ == "__main__":
-    quickstart = NexusQuickStart()
+    quickstart = llmfyQuickStart()
     quickstart.run()
