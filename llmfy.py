@@ -47,8 +47,11 @@ Examples:
     # Process command
     process_parser = subparsers.add_parser('process', help='Process inbox documents')
     process_parser.add_argument('--file', '-f', help='Process specific file')
-    process_parser.add_argument('--threshold', '-t', type=float, default=9.5,
-                               help='Quality threshold (default: 9.5)')
+    process_parser.add_argument('--threshold', '-t', type=float, default=7.0,
+                               help='Quality threshold (default: 7.0)')
+    process_parser.add_argument('--assess', '-a', action='store_true',
+                               help='Run assessment and planning before processing')
+    process_parser.add_argument('--plan', '-p', help='Path to processing plan JSON')
     
     # Validate command
     validate_parser = subparsers.add_parser('validate', help='Validate document quality')
@@ -58,8 +61,8 @@ Examples:
     # Search command
     search_parser = subparsers.add_parser('search', help='Search knowledge base')
     search_parser.add_argument('query', help='Search query')
-    search_parser.add_argument('--limit', '-l', type=int, default=5,
-                              help='Number of results')
+    search_parser.add_argument('--results', '-n', type=int, default=10,
+                              help='Number of results (default: 10)')
     
     # Status command
     status_parser = subparsers.add_parser('status', help='Show system status')
@@ -85,10 +88,18 @@ Examples:
     elif args.command == 'process':
         print_banner()
         console.print("\n[cyan]🔄 Processing documents...[/cyan]\n")
+        cmd_parts = [sys.executable, "-m", "src.core.llmfy_pipeline"]
+        
         if args.file:
-            cmd = f"{sys.executable} -m src.core.llmfy_pipeline --input {args.file}"
-        else:
-            cmd = f"{sys.executable} -m src.core.llmfy_pipeline"
+            cmd_parts.extend(["--input", args.file])
+        if args.threshold != 7.0:
+            cmd_parts.extend(["--quality-threshold", str(args.threshold)])
+        if args.assess:
+            cmd_parts.append("--assess")
+        if args.plan:
+            cmd_parts.extend(["--plan", args.plan])
+            
+        cmd = " ".join(cmd_parts)
         os.system(cmd)
     
     elif args.command == 'validate':
@@ -99,9 +110,16 @@ Examples:
     
     elif args.command == 'search':
         print_banner()
-        console.print(f"\n[cyan]🔍 Searching for: {args.query}[/cyan]\n")
-        console.print("[yellow]Search functionality coming soon![/yellow]")
-        console.print("For now, documents are in data/processed/")
+        # Import and use search directly to avoid warnings
+        from src.search import KnowledgeSearch
+        try:
+            search = KnowledgeSearch()
+            if args.query:
+                search.search(args.query, n_results=args.results)
+            else:
+                search.get_stats()
+        except Exception as e:
+            console.print(f"[red]Search error: {e}[/red]")
     
     elif args.command == 'status':
         print_banner()

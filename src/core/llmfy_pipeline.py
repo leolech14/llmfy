@@ -67,7 +67,8 @@ class LlmfyPipeline(KnowledgeBasePipeline):
             'failed': 0,
             'average_initial_score': 0,
             'average_final_score': 0,
-            'enhancement_improvements': []
+            'enhancement_improvements': [],
+            'chunk_tokens': []  # Track tokens for auto blind test
         }
         
     def process_documents(self, documents: List[Any]) -> List[Any]:
@@ -108,6 +109,10 @@ class LlmfyPipeline(KnowledgeBasePipeline):
                 
                 # Update statistics
                 self.quality_stats['total_chunks'] += 1
+                
+                # Track tokens for auto blind test
+                chunk_tokens = chunk.metadata.get('chunk_tokens', len(chunk.page_content) // 4)
+                self.quality_stats['chunk_tokens'].append(chunk_tokens)
                 
                 # Create quality metadata
                 quality_metadata = {
@@ -328,10 +333,22 @@ class LlmfyPipeline(KnowledgeBasePipeline):
         console.print("[dim]Review failed chunks for manual improvement[/dim]")
     
     def _offer_blind_test(self, filename: str):
-        """Offer to run blind test evaluation"""
+        """Offer to run blind test evaluation - automatic for small documents"""
         from rich.prompt import Confirm
         
-        if Confirm.ask("\n[cyan]Would you like to run a blind test evaluation?[/cyan]"):
+        # Calculate total tokens
+        total_tokens = sum(self.quality_stats.get('chunk_tokens', []))
+        
+        # Auto-run for small documents (< 5000 tokens)
+        auto_run = total_tokens > 0 and total_tokens < 5000
+        
+        if auto_run:
+            console.print(f"\n[cyan]📊 Document has {total_tokens} tokens - automatically running blind test[/cyan]")
+            run_test = True
+        else:
+            run_test = Confirm.ask("\n[cyan]Would you like to run a blind test evaluation?[/cyan]")
+        
+        if run_test:
             try:
                 from ..evaluation.blind_test import BlindTestEvaluator
                 console.print("\n[bold]🔍 Starting blind test evaluation...[/bold]")
@@ -374,6 +391,16 @@ def main():
         action='store_true',
         help='Force reprocessing of already processed files'
     )
+    parser.add_argument(
+        '--assess', '-a',
+        action='store_true',
+        help='Run assessment and planning before processing'
+    )
+    parser.add_argument(
+        '--plan', '-p',
+        type=str,
+        help='Path to existing processing plan JSON file'
+    )
     
     args = parser.parse_args()
     
@@ -386,20 +413,51 @@ def main():
     # Process input
     if args.input:
         input_path = Path(args.input)
-        if input_path.is_file():
-            documents = pipeline.loader.load_file(input_path, force=args.force)
-        elif input_path.is_dir():
-            documents = pipeline.loader.load_directory(input_path, force=args.force)
-        else:
-            console.print(f"[red]Error: Invalid input path: {args.input}[/red]")
+        
+        # If assessment requested, run assess_and_plan first
+        if args.assess:
+            console.print("[cyan]🔍 Running assessment and planning...[/cyan]")
+            assessment_result = pipeline.assess_and_plan(source_path=str(input_path))
+            
+            if assessment_result.get('plan_saved'):
+                console.print(f"[green]✅ Assessment complete! Plan saved to: {assessment_result['plan_path']}[/green]")
+                console.print("\n[yellow]Review the plan and run again with --plan flag to execute[/yellow]")
+                return
+        
+        # If plan provided, execute it
+        elif args.plan:
+            console.print(f"[cyan]📋 Executing plan from: {args.plan}[/cyan]")
+            pipeline.process_from_plan(plan_path=args.plan)
             return
         
-        # Process documents
-        pipeline.process_documents(documents)
+        # Otherwise, process directly (current behavior)
+        else:
+            if input_path.is_file():
+                documents = pipeline.loader.load_file(input_path, force=args.force)
+            elif input_path.is_dir():
+                documents = pipeline.loader.load_directory(input_path, force=args.force)
+            else:
+                console.print(f"[red]Error: Invalid input path: {args.input}[/red]")
+                return
+            
+            # Process documents
+            pipeline.process_documents(documents)
     else:
         # Process inbox
-        console.print("[blue]Processing inbox directory...[/blue]")
-        pipeline.process_inbox()
+        if args.assess:
+            console.print("[cyan]🔍 Running assessment on inbox...[/cyan]")
+            assessment_result = pipeline.assess_and_plan()
+            
+            if assessment_result.get('plan_saved'):
+                console.print(f"[green]✅ Assessment complete! Plan saved to: {assessment_result['plan_path']}[/green]")
+                console.print("\n[yellow]Review the plan and run again with --plan flag to execute[/yellow]")
+                return
+        elif args.plan:
+            console.print(f"[cyan]📋 Executing plan from: {args.plan}[/cyan]")
+            pipeline.process_from_plan(plan_path=args.plan)
+        else:
+            console.print("[blue]Processing inbox directory...[/blue]")
+            pipeline.process_inbox()
 
 if __name__ == "__main__":
     main()
