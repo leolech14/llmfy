@@ -19,8 +19,8 @@ console = Console()
 
 class llmfyQuickStart:
     def __init__(self):
-        self.nexus_root = Path(__file__).parent
-        self.venv_path = self.nexus_root / "venv"
+        self.llmfy_root = Path(__file__).parent
+        self.venv_path = self.llmfy_root / "venv"
         self.requirements = [
             "langchain>=0.0.300",
             "chromadb>=0.4.0",
@@ -195,11 +195,11 @@ enhancements:
 """
         
         # Create config directory
-        config_dir = self.nexus_root / "config"
+        config_dir = self.llmfy_root / "config"
         config_dir.mkdir(exist_ok=True)
         
         # Write configs
-        (config_dir / "nexus_config.yaml").write_text(main_config)
+        (config_dir / "llmfy_config.yaml").write_text(main_config)
         (config_dir / "quality_rules.yaml").write_text(quality_rules)
         
         console.print("[green]✅ Configuration files created[/green]")
@@ -214,10 +214,10 @@ OPENAI_API_KEY=your_api_key_here
 # Pinecone (for cloud storage)
 PINECONE_API_KEY=your_api_key_here
 PINECONE_ENV=us-east-1-aws
-PINECONE_INDEX_NAME=nexus-knowledge
+PINECONE_INDEX_NAME=llmfy-knowledge
 
 # Environment
-NEXUS_ENV=development
+LLMFY_ENV=development
 
 # Quality Settings
 QUALITY_THRESHOLD=9.5
@@ -229,7 +229,7 @@ CACHE_EMBEDDINGS=true
 MAX_MONTHLY_COST=100
 """
         
-        env_path = self.nexus_root / ".env"
+        env_path = self.llmfy_root / ".env"
         if not env_path.exists():
             env_path.write_text(env_template)
             console.print("[green]✅ .env template created[/green]")
@@ -269,7 +269,7 @@ except Exception as e:
 """
         
         # Write test script
-        test_path = self.nexus_root / "_test_install.py"
+        test_path = self.llmfy_root / "_test_install.py"
         test_path.write_text(test_script)
         
         # Run test
@@ -282,7 +282,7 @@ except Exception as e:
             [str(python_path), str(test_path)],
             capture_output=True,
             text=True,
-            cwd=str(self.nexus_root)
+            cwd=str(self.llmfy_root)
         )
         
         console.print(result.stdout)
@@ -305,9 +305,9 @@ except Exception as e:
             f"   [cyan]{self.venv_path}\\Scripts\\activate[/cyan] (Windows)\n\n"
             "2. Add your API keys to .env (for production)\n\n"
             "3. Process your first document:\n"
-            "   [cyan]python -m src.core.nexus_pipeline --input data/inbox/test.md[/cyan]\n\n"
+            "   [cyan]python -m src.core.llmfy_pipeline --input data/inbox/test.md[/cyan]\n\n"
             "4. Check quality scores:\n"
-            "   [cyan]python nexus_validator.py data/processed/[/cyan]\n\n"
+            "   [cyan]python llmfy_validator.py data/processed/[/cyan]\n\n"
             "[dim]Remember: Quality first. Every chunk must be 9.5/10 or higher.[/dim]",
             border_style="green"
         ))

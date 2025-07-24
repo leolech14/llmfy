@@ -33,7 +33,7 @@ key_files = [
     'src/quality/quality_scorer.py',
     'src/quality/quality_enhancer.py',
     'src/embeddings/hybrid_embedder.py',
-    'config/nexus_config.yaml',
+    'config/llmfy_config.yaml',
     '.env'
 ]
 

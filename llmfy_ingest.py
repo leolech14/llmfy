@@ -89,7 +89,7 @@ def ingest_document(source_path: str, move: bool = True, smart: bool = True, aut
     else:
         # Simple ingestion without analysis
         console.print(Panel.fit(
-            f"[bold cyan]📥 Nexus Document Ingestion[/bold cyan]\n\n"
+            f"[bold cyan]📥 llmfy Document Ingestion[/bold cyan]\n\n"
             f"Source: {source.name}\n"
             f"Size: {source.stat().st_size:,} bytes\n"
             f"Destination: {dest.name}",
@@ -124,16 +124,16 @@ def main():
         epilog="""
 Examples:
   # Smart ingestion with analysis (recommended)
-  nexus_ingest document.md
+  llmfy_ingest document.md
   
   # Smart ingestion with auto-processing
-  nexus_ingest document.md --process
+  llmfy_ingest document.md --process
   
   # Simple ingestion without analysis
-  nexus_ingest document.md --no-smart
+  llmfy_ingest document.md --no-smart
   
   # Copy file instead of moving
-  nexus_ingest document.md --copy
+  llmfy_ingest document.md --copy
 """
     )
     parser.add_argument(

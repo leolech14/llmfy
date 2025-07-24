@@ -41,7 +41,7 @@ class LlmfyPipeline(KnowledgeBasePipeline):
     """
     
     def __init__(self, storage_mode: Optional[str] = None, quality_threshold: float = 7.0):
-        """Initialize Nexus Pipeline with quality features"""
+        """Initialize llmfy Pipeline with quality features"""
         super().__init__(storage_mode)
         
         # Use improved text processor
@@ -118,7 +118,7 @@ class LlmfyPipeline(KnowledgeBasePipeline):
                     'initial_quality_score': initial_score,
                     'quality_dimensions': quality_result['dimension_scores'],
                     'quality_assessed_at': datetime.now(timezone.utc).isoformat(),
-                    'nexus_version': '1.0'
+                    'llmfy_version': '1.0'
                 }
                 
                 # Check if enhancement needed
@@ -350,7 +350,7 @@ class LlmfyPipeline(KnowledgeBasePipeline):
 
 
 def main():
-    """Command-line interface for Nexus Pipeline"""
+    """Command-line interface for llmfy Pipeline"""
     import argparse
     
     parser = argparse.ArgumentParser(

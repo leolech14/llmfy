@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-🧪 Nexus Validator - Quality validation tool for processed documents
+🧪 llmfy Validator - Quality validation tool for processed documents
 
 Validates that all chunks in the system meet the 9.5/10 quality standard.
 """
@@ -25,9 +25,9 @@ from src.quality.quality_scorer import QualityAnalyzer
 
 console = Console()
 
-class NexusValidator:
+class LlmfyValidator:
     """
-    Validates document quality in the Nexus system.
+    Validates document quality in the llmfy system.
     
     Features:
     - Scan processed documents for quality scores
@@ -44,7 +44,7 @@ class NexusValidator:
     def validate_directory(self, directory: Path) -> Dict[str, Any]:
         """Validate all documents in a directory"""
         console.print(Panel.fit(
-            f"[bold cyan]🧪 Nexus Quality Validator[/bold cyan]\n"
+            f"[bold cyan]🧪 llmfy Quality Validator[/bold cyan]\n"
             f"Validating: {directory}\n"
             f"Quality Threshold: {self.quality_threshold}/10",
             border_style="cyan"
@@ -291,7 +291,7 @@ class NexusValidator:
 def main():
     """Command-line interface"""
     parser = argparse.ArgumentParser(
-        description="Nexus Quality Validator - Validate chunk quality"
+        description="llmfy Quality Validator - Validate chunk quality"
     )
     parser.add_argument(
         'path',
@@ -313,7 +313,7 @@ def main():
     args = parser.parse_args()
     
     # Initialize validator
-    validator = NexusValidator(quality_threshold=args.threshold)
+    validator = LlmfyValidator(quality_threshold=args.threshold)
     
     # Validate path
     path = Path(args.path)
