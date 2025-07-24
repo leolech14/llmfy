@@ -5,14 +5,54 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "llmfy"
 version = "0.1.0"
-
-description = "Quality-first document processing toolkit"
+description = "Quality-first document processing toolkit for LLMs"
 readme = "README.md"
 requires-python = ">=3.8"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "llmfy Contributors"}
+]
+keywords = ["llm", "rag", "document-processing", "quality", "embeddings"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "langchain>=0.1.0",
+    "chromadb>=0.4.0",
+    "sentence-transformers>=2.2.0",
+    "rich>=13.0.0",
+    "python-dotenv>=1.0.0",
+    "openai>=1.0.0",
+    "PyPDF2>=3.0.0",
+    "pydantic>=2.0.0",
+    "numpy>=1.24.0",
+    "tiktoken>=0.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+]
 
 [project.scripts]
 llmfy = "llmfy:main"
 
-[tool.setuptools.packages.find]
-include = ["src*"]
+[tool.setuptools]
+package-dir = {"" = "."}
+packages = ["llmfy", "src", "src.core", "src.quality", "src.embeddings", "src.search", "src.evaluation", "src.storage"]
+
+[tool.setuptools.package-data]
+llmfy = ["config/*.yaml"]
 
