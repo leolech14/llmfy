@@ -40,11 +40,26 @@ class VectorStore:
             settings=Settings(anonymized_telemetry=False)
         )
         
-        # Create or get collection
-        self.chroma_collection = self.chroma_client.get_or_create_collection(
-            name="knowledge_base",
-            metadata={"description": "Personal knowledge base embeddings"}
-        )
+        # Create or get collection - use different collections for different embedding dimensions
+        # This avoids dimension mismatch errors
+        try:
+            # Try to get existing collection
+            self.chroma_collection = self.chroma_client.get_collection("knowledge_base")
+        except:
+            # Create new collection if it doesn't exist
+            self.chroma_collection = self.chroma_client.create_collection(
+                name="knowledge_base",
+                metadata={"description": "Personal knowledge base embeddings"}
+            )
+        
+        # Also create a hybrid collection for mixed embeddings
+        try:
+            self.hybrid_collection = self.chroma_client.get_or_create_collection(
+                name="knowledge_base_hybrid",
+                metadata={"description": "Hybrid embeddings (384/1536 dims)"}
+            )
+        except:
+            self.hybrid_collection = None
         
         console.print(f"[green]ChromaDB initialized with {self.chroma_collection.count()} documents[/green]")
     
@@ -130,15 +145,47 @@ class VectorStore:
             documents.append(doc.page_content)
         
         try:
-            self.chroma_collection.add(
-                ids=ids,
-                embeddings=embeddings,
-                metadatas=metadatas,
-                documents=documents
-            )
+            # Check embedding dimension and use appropriate collection
+            if embeddings and len(embeddings[0]) == 384:
+                # Use main collection for 384-dim embeddings
+                self.chroma_collection.add(
+                    ids=ids,
+                    embeddings=embeddings,
+                    metadatas=metadatas,
+                    documents=documents
+                )
+            elif self.hybrid_collection and embeddings and len(embeddings[0]) == 1536:
+                # Use hybrid collection for 1536-dim embeddings
+                self.hybrid_collection.add(
+                    ids=ids,
+                    embeddings=embeddings,
+                    metadatas=metadatas,
+                    documents=documents
+                )
+            else:
+                # Try to add to whichever collection accepts it
+                try:
+                    self.chroma_collection.add(
+                        ids=ids,
+                        embeddings=embeddings,
+                        metadatas=metadatas,
+                        documents=documents
+                    )
+                except:
+                    if self.hybrid_collection:
+                        self.hybrid_collection.add(
+                            ids=ids,
+                            embeddings=embeddings,
+                            metadatas=metadatas,
+                            documents=documents
+                        )
+                    else:
+                        raise
+            
             return len(ids)
         except Exception as e:
             console.print(f"[red]Error adding to ChromaDB: {e}[/red]")
+            console.print(f"[yellow]Embedding dimension: {len(embeddings[0]) if embeddings else 'unknown'}[/yellow]")
             return 0
     
     def _add_to_pinecone(self, doc_embeddings: List[Tuple[Document, List[float]]]) -> int:

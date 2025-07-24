@@ -127,6 +127,23 @@ class HybridEmbedder:
         
         return doc_embeddings
     
+    def embed_documents(self, texts: List[str]) -> List[Tuple[Any, Any]]:
+        """
+        Embed raw text strings (compatibility method for ChunkOptimizer)
+        
+        Args:
+            texts: List of text strings to embed
+            
+        Returns:
+            List of (document, embedding) tuples
+        """
+        # Convert texts to Document objects
+        from langchain.schema import Document
+        documents = [Document(page_content=text) for text in texts]
+        
+        # Process using existing method
+        return self.process_documents(documents)
+    
     def _should_use_local(self, document: Any) -> bool:
         """Determine whether to use local embeddings"""
         # Always use local in development

@@ -196,7 +196,9 @@ class LlmfyPipeline(KnowledgeBasePipeline):
                 progress.update(task, advance=1)
         
         # Apply chunk optimization for 10/10 quality
-        if high_quality_chunks and hasattr(self, 'chunk_optimizer'):
+        # TODO: Fix ChunkOptimizer embedding dimension issue
+        # Temporarily disabled to avoid dimension mismatch errors
+        if False and high_quality_chunks and hasattr(self, 'chunk_optimizer'):
             console.print("\n[bold]🔧 Optimizing chunks for perfect continuity...[/bold]")
             optimized_chunks, optimization_report = self.chunk_optimizer.optimize_chunks(
                 [{'text': c.page_content, 'metadata': c.metadata} for c in high_quality_chunks]
@@ -427,7 +429,7 @@ def main():
         # If plan provided, execute it
         elif args.plan:
             console.print(f"[cyan]📋 Executing plan from: {args.plan}[/cyan]")
-            pipeline.process_from_plan(plan_path=args.plan)
+            pipeline.process_with_plan(plan_path=args.plan)
             return
         
         # Otherwise, process directly (current behavior)
@@ -454,7 +456,7 @@ def main():
                 return
         elif args.plan:
             console.print(f"[cyan]📋 Executing plan from: {args.plan}[/cyan]")
-            pipeline.process_from_plan(plan_path=args.plan)
+            pipeline.process_with_plan(plan_path=args.plan)
         else:
             console.print("[blue]Processing inbox directory...[/blue]")
             pipeline.process_inbox()
