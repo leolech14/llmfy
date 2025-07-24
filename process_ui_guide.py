@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Process the UI/UX Architecture Guide through Nexus
+Process the UI/UX Architecture Guide through llmfy
 """
 
 import sys
@@ -58,7 +58,7 @@ print("\n📦 Document would be processed into multiple chunks")
 print(f"Estimated chunks: ~{len(content) // 1500} chunks")
 
 print("\n🚀 To process the full document, run:")
-print("python -m src.core.nexus_pipeline --input data/inbox/architects_guide_ui_ux.md")
+print("python -m src.core.llmfy_pipeline --input data/inbox/architects_guide_ui_ux.md")
 print("\nThis will:")
 print("1. Split into optimal chunks")
 print("2. Assess quality of each chunk")

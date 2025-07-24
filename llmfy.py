@@ -105,11 +105,11 @@ Examples:
     
     elif args.command == 'status':
         print_banner()
-        nexus_root = Path(__file__).parent
+        llmfy_root = Path(__file__).parent
         
         # Count documents
-        inbox_count = len(list((nexus_root / "data/inbox").glob("*.md")))
-        processed_count = len(list((nexus_root / "data/processed").glob("*.json")))
+        inbox_count = len(list((llmfy_root / "data/inbox").glob("*.md")))
+        processed_count = len(list((llmfy_root / "data/processed").glob("*.json")))
         
         console.print("\n[bold]System Status:[/bold]")
         console.print(f"  📥 Inbox: {inbox_count} documents")

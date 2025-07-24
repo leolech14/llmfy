@@ -1,13 +1,13 @@
-# 🤖 Nexus Smart Ingestion System
+# 🤖 llmfy Smart Ingestion System
 
 ## Overview
 
-The Nexus AI Library now features **Smart Ingestion** - an intelligent system that analyzes documents BEFORE processing to create optimal ingestion plans.
+The llmfy AI Library now features **Smart Ingestion** - an intelligent system that analyzes documents BEFORE processing to create optimal ingestion plans.
 
 ## How It Works
 
 ### 1. Document Analysis
-When you ingest a document, Nexus:
+When you ingest a document, llmfy:
 - **Profiles the document type**: Technical, Tutorial, Reference, or Narrative
 - **Analyzes structure**: Linear, Hierarchical, or Fragmented
 - **Detects special features**: Code blocks, tables, images, etc.
@@ -15,7 +15,7 @@ When you ingest a document, Nexus:
 - **Extracts topics**: Identifies main subjects and themes
 
 ### 2. Intelligent Planning
-Based on analysis, Nexus creates a plan:
+Based on analysis, llmfy creates a plan:
 - **Optimal chunk size**: Varies by document type (1000-2000 chars)
 - **Smart chunking strategy**: Code-aware, step-aware, or header-aware
 - **Enhancement strategies**: What improvements are needed
@@ -35,22 +35,22 @@ Works with ANY document type:
 ### Smart Ingestion (Recommended)
 ```bash
 # Analyze and ingest with smart planning
-python nexus_ingest.py /path/to/document.md
+python llmfy_ingest.py /path/to/document.md
 
 # Smart ingestion with auto-processing
-python nexus_ingest.py /path/to/document.md --process
+python llmfy_ingest.py /path/to/document.md --process
 ```
 
 ### Simple Ingestion
 ```bash
 # Skip analysis (not recommended)
-python nexus_ingest.py /path/to/document.md --no-smart
+python llmfy_ingest.py /path/to/document.md --no-smart
 ```
 
-### Using the Main Nexus Command
+### Using the Main llmfy Command
 ```bash
 # One command for everything
-python nexus.py ingest /path/to/document.md --process
+python llmfy.py ingest /path/to/document.md --process
 ```
 
 ## Example Output
@@ -136,7 +136,7 @@ If document quality is below 9.5/10, smart ingestion plans:
 
 ```bash
 # Smart ingestion on the UI/UX guide
-python nexus_ingest.py data/inbox/architects_guide_ui_ux.md
+python llmfy_ingest.py data/inbox/architects_guide_ui_ux.md
 
 # Watch as it:
 # 1. Analyzes the document type (Technical)
@@ -148,5 +148,5 @@ python nexus_ingest.py data/inbox/architects_guide_ui_ux.md
 # 7. Processes with the optimized plan
 ```
 
-The Smart Ingestion system ensures every document is processed optimally, regardless of its type or structure. It's the foundation of Nexus's quality-first approach!
+The Smart Ingestion system ensures every document is processed optimally, regardless of its type or structure. It's the foundation of llmfy's quality-first approach!
 

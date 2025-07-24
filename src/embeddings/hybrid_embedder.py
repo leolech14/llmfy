@@ -29,7 +29,7 @@ class HybridEmbedder:
     
     def __init__(self, environment: str = None):
         """Initialize hybrid embedder"""
-        self.environment = environment or os.getenv('NEXUS_ENV', 'development')
+        self.environment = environment or os.getenv('LLMFY_ENV', 'development')
         
         # Initialize base embedder (has OpenAI)
         self.cloud_embedder = EmbeddingGenerator()

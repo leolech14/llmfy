@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-🧠 Nexus Cache Management Tool
+🧠 llmfy Cache Management Tool
 
-Manage the processing cache for the Nexus AI Library.
+Manage the processing cache for the llmfy AI Library.
 """
 
 import sys
@@ -93,7 +93,7 @@ def remove_from_cache(file_pattern: str):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Nexus Cache Management Tool"
+        description="llmfy Cache Management Tool"
     )
     
     subparsers = parser.add_subparsers(dest='command', help='Commands')
