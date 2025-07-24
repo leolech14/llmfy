@@ -12,6 +12,6 @@ from pathlib import Path
 from llmfy import main
 
 if __name__ == "__main__":
-    print("🏗️ llmfy - Making your documents LLM-ready with 9.5/10 quality standards")
+    print("🏗️ llmfy - Making your documents LLM-ready with 7.0/10 quality standards")
     print("-" * 60)
     main()

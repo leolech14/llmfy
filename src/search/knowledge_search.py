@@ -26,10 +26,22 @@ class KnowledgeSearch:
         # Initialize ChromaDB client
         self.client = chromadb.PersistentClient(path=str(self.db_path))
         
-        # Get or create collection
+        # Get or create collections
         try:
             self.collection = self.client.get_collection("knowledge_base")
-            console.print(f"[green]✅ Connected to knowledge base with {self.collection.count()} chunks[/green]")
+            main_count = self.collection.count()
+            
+            # Also get hybrid collection if it exists
+            try:
+                self.hybrid_collection = self.client.get_collection("knowledge_base_hybrid")
+                hybrid_count = self.hybrid_collection.count()
+                total_count = main_count + hybrid_count
+                console.print(f"[green]✅ Connected to knowledge base with {total_count} chunks[/green]")
+                console.print(f"[dim]   Main: {main_count} | Hybrid: {hybrid_count}[/dim]")
+            except:
+                self.hybrid_collection = None
+                console.print(f"[green]✅ Connected to knowledge base with {main_count} chunks[/green]")
+                
         except Exception as e:
             console.print(f"[red]Error: Could not access knowledge base: {e}[/red]")
             raise
@@ -54,13 +66,30 @@ class KnowledgeSearch:
         console.print(f"\n[cyan]🔍 Searching for: '{query}'[/cyan]")
         
         try:
-            # Perform similarity search
+            # Search main collection
             results = self.collection.query(
                 query_texts=[query],
                 n_results=n_results,
                 where=filter_metadata,
                 include=["documents", "metadatas", "distances"]
             )
+            
+            # Also search hybrid collection if available
+            # Note: Skip hybrid search for now due to embedding dimension mismatch
+            # TODO: Implement dual-embedding search
+            if False and self.hybrid_collection:
+                hybrid_results = self.hybrid_collection.query(
+                    query_texts=[query],
+                    n_results=n_results,
+                    where=filter_metadata,
+                    include=["documents", "metadatas", "distances"]
+                )
+                
+                # Merge results
+                if hybrid_results['documents'][0]:
+                    results['documents'][0].extend(hybrid_results['documents'][0])
+                    results['metadatas'][0].extend(hybrid_results['metadatas'][0])
+                    results['distances'][0].extend(hybrid_results['distances'][0])
             
             if not results['documents'][0]:
                 console.print("[yellow]No results found[/yellow]")
@@ -82,6 +111,14 @@ class KnowledgeSearch:
                     'rank': i + 1
                 }
                 formatted_results.append(result)
+            
+            # Sort by similarity score and limit to n_results
+            formatted_results.sort(key=lambda x: x['similarity_score'], reverse=True)
+            formatted_results = formatted_results[:n_results]
+            
+            # Re-rank after sorting
+            for i, result in enumerate(formatted_results):
+                result['rank'] = i + 1
             
             # Display results
             self._display_results(formatted_results, show_scores)

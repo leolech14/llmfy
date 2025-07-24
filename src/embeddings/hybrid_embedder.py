@@ -27,16 +27,17 @@ class HybridEmbedder:
     Returns (document, embedding) tuples as expected by vector store.
     """
     
-    def __init__(self, environment: str = None):
+    def __init__(self, environment: str = None, force_openai: bool = True):
         """Initialize hybrid embedder"""
-        self.environment = environment or os.getenv('LLMFY_ENV', 'development')
+        self.environment = environment or os.getenv('LLMFY_ENV', 'production')  # Default to production for OpenAI
+        self.force_openai = force_openai
         
         # Initialize base embedder (has OpenAI)
         self.cloud_embedder = EmbeddingGenerator()
         
-        # Initialize local embedder if available
+        # Initialize local embedder if available (but we'll prefer OpenAI)
         self.local_embedder = None
-        if SENTENCE_TRANSFORMERS_AVAILABLE:
+        if SENTENCE_TRANSFORMERS_AVAILABLE and not force_openai:
             try:
                 self.local_embedder = SentenceTransformer('all-MiniLM-L6-v2')
                 print("✅ Local embedder initialized (all-MiniLM-L6-v2)")
@@ -146,7 +147,15 @@ class HybridEmbedder:
     
     def _should_use_local(self, document: Any) -> bool:
         """Determine whether to use local embeddings"""
-        # Always use local in development
+        # Force OpenAI if requested
+        if self.force_openai:
+            return False
+        
+        # Use OpenAI if available, regardless of environment
+        if hasattr(self.cloud_embedder, 'client') and self.cloud_embedder.client:
+            return False
+        
+        # Fallback to local in development if OpenAI not available
         if self.environment == 'development':
             return True
         

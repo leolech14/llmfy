@@ -1,0 +1,53 @@
+🏗️ llmfy - Making your documents LLM-ready with 9.5/10 quality standards
+------------------------------------------------------------
+╭─────────────────────────────────────────╮
+│ 🏗️ llmfy - LLM-ify Your Documents        │
+│ Quality-First Document Processing       │
+│ Every chunk must score 9.5/10 or higher │
+╰─────────────────────────────────────────╯
+
+🔄 Processing documents...
+
+Initializing ChromaDB...
+ChromaDB initialized with 247 documents
+✅ Local embedder initialized (all-MiniLM-L6-v2)
+✅ Local embedder initialized (all-MiniLM-L6-v2)
+📋 Executing plan from: data/processing_plan_20250724_015606.json
+Loading processing plan from: data/processing_plan_20250724_015606.json
+Plan-based processing not fully implemented yet
+Falling back to standard processing...
+╭───────────────────────────────╮
+│ 📥 Processing Inbox Documents │
+╰───────────────────────────────╯
+Loading documents from inbox...
+Found 11 files to process
+Error loading architects_guide.docx: No module named 'docx2txt'
+Skipping already processed file: Building a Top-Level AI Library Knowledge 
+System U.md
+Use --force to reprocess
+Skipping already processed file: Advanced Technical Analysis_ MCP-Based AI Agent
+Ar.pdf
+Use --force to reprocess
+Skipping already processed file: test_pipeline.md
+Use --force to reprocess
+Skipping already processed file: Bridging MCPs and AI Agents_ Practical Pathways
+to.pdf
+Use --force to reprocess
+Skipping already processed file: Building a Personal Embedding System with 
+Pinecone.md
+Use --force to reprocess
+Error loading Quality_Control_Methods_for_LLM_Knowledge_Bases.docx: No module 
+named 'docx2txt'
+Skipping already processed file: Advanced Strategies for AI-Friendly Directory 
+Syst.pdf
+Use --force to reprocess
+Skipping already processed file: n8n-complete-guide.md
+Use --force to reprocess
+Skipping already processed file: Building a Natural AI Specialist System 
+Locally_ A.pdf
+Use --force to reprocess
+Skipping already processed file: Building a Terminal-Based AI Agent with MCP 
+Integr.pdf
+Use --force to reprocess
+Loading files... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+No new documents to process in inbox

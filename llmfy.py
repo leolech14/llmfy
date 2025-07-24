@@ -18,7 +18,7 @@ def print_banner():
     console.print(Panel.fit(
         "[bold cyan]🏗️ llmfy - LLM-ify Your Documents[/bold cyan]\n"
         "[white]Quality-First Document Processing[/white]\n"
-        "[dim]Every chunk must score 9.5/10 or higher[/dim]",
+        "[dim]Every chunk must score 7.0/10 or higher[/dim]",
         border_style="cyan"
     ))
 
@@ -43,6 +43,8 @@ Examples:
     ingest_parser.add_argument('document', help='Path to document')
     ingest_parser.add_argument('--process', '-p', action='store_true',
                               help='Process immediately after ingesting')
+    ingest_parser.add_argument('--force', '-f', action='store_true',
+                              help='Force reprocessing if already processed')
     
     # Process command
     process_parser = subparsers.add_parser('process', help='Process inbox documents')
@@ -52,6 +54,8 @@ Examples:
     process_parser.add_argument('--assess', '-a', action='store_true',
                                help='Run assessment and planning before processing')
     process_parser.add_argument('--plan', '-p', help='Path to processing plan JSON')
+    process_parser.add_argument('--force', action='store_true',
+                               help='Force reprocessing of already processed files')
     
     # Validate command
     validate_parser = subparsers.add_parser('validate', help='Validate document quality')
@@ -60,9 +64,11 @@ Examples:
     
     # Search command
     search_parser = subparsers.add_parser('search', help='Search knowledge base')
-    search_parser.add_argument('query', help='Search query')
+    search_parser.add_argument('query', nargs='?', help='Search query')
     search_parser.add_argument('--results', '-n', type=int, default=10,
                               help='Number of results (default: 10)')
+    search_parser.add_argument('--stats', '-s', action='store_true',
+                              help='Show knowledge base statistics')
     
     # Status command
     status_parser = subparsers.add_parser('status', help='Show system status')
@@ -98,6 +104,8 @@ Examples:
             cmd_parts.append("--assess")
         if args.plan:
             cmd_parts.extend(["--plan", args.plan])
+        if hasattr(args, 'force') and args.force:
+            cmd_parts.append("--force")
             
         cmd = " ".join(cmd_parts)
         os.system(cmd)
@@ -110,14 +118,16 @@ Examples:
     
     elif args.command == 'search':
         print_banner()
-        # Import and use search directly to avoid warnings
-        from src.search import KnowledgeSearch
+        # Use unified search that handles both collections
+        from src.search.unified_search import UnifiedSearch
         try:
-            search = KnowledgeSearch()
-            if args.query:
+            search = UnifiedSearch()
+            if hasattr(args, 'stats') and args.stats:
+                search.get_stats()
+            elif args.query:
                 search.search(args.query, n_results=args.results)
             else:
-                search.get_stats()
+                console.print("[yellow]Please provide a search query or use --stats[/yellow]")
         except Exception as e:
             console.print(f"[red]Search error: {e}[/red]")
     
@@ -132,8 +142,8 @@ Examples:
         console.print("\n[bold]System Status:[/bold]")
         console.print(f"  📥 Inbox: {inbox_count} documents")
         console.print(f"  ✅ Processed: {processed_count} documents")
-        console.print(f"  🎯 Quality Threshold: 9.5/10")
-        console.print(f"  🌍 Environment: Development (free embeddings)")
+        console.print(f"  🎯 Quality Threshold: 7.0/10")
+        console.print(f"  🌍 Environment: Production (OpenAI embeddings)")
         console.print(f"  💾 Storage: ChromaDB (local)")
         
         # Check if virtual environment is active
